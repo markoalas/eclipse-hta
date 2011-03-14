@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+  <extension point="org.eclipse.graphiti.ui.diagramTypes">
+    <diagramType
+      description="This is the diagram type for my Graphiti tutorial"
+      id="org.eclipse.editor.DiagramType"
+      name="My Graphiti Tutorial Diagram Type"
+      type="editorDiagram">
+    </diagramType>
+  </extension>
+
+  <extension point="org.eclipse.graphiti.ui.diagramTypeProviders">
+
+    <diagramTypeProvider
+      class="org.eclipse.editor.DiagramTypeProvider"
+      description="This is my editor for the Graphiti tutorial"
+      id="org.eclipse.editor.DiagramTypeProvider"
+      name="My tutorial editor">
+      <diagramType id="org.eclipse.editor.DiagramType">
+      </diagramType>
+
+    </diagramTypeProvider>
+
+  </extension>
+
+</plugin>
