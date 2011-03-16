@@ -1,9 +1,0 @@
-#encoding=UTF-8
-#version=1
-org.eclipse.graphiti.doc.source,0.7.1.v20110110-1514,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.doc.source_0.7.1.v20110110-1514.jar,-1,false
-org.eclipse.graphiti.examples.common.source,0.7.1.v20110111-0756,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.examples.common.source_0.7.1.v20110111-0756.jar,-1,false
-org.eclipse.graphiti.examples.tutorial.source,0.7.1.v20110111-0756,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.examples.tutorial.source_0.7.1.v20110111-0756.jar,-1,false
-org.eclipse.graphiti.mm.source,0.7.1.v20110110-1225,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.mm.source_0.7.1.v20110110-1225.jar,-1,false
-org.eclipse.graphiti.pattern.source,0.7.1.v20110110-1225,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.pattern.source_0.7.1.v20110110-1225.jar,-1,false
-org.eclipse.graphiti.source,0.7.1.v20110110-1225,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.source_0.7.1.v20110110-1225.jar,-1,false
-org.eclipse.graphiti.ui.source,0.7.1.v20110111-0756,file:/home/marko/eclipse/plugins/org.eclipse.graphiti.ui.source_0.7.1.v20110111-0756.jar,-1,false
