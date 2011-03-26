@@ -1,7 +1,5 @@
 package org.eclipse.editor.features;
 
-import java.util.Iterator;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -41,11 +39,10 @@ public class LayoutFeature extends AbstractLayoutFeature {
 
     public boolean layout(ILayoutContext context) {
         boolean anythingChanged = false;
-        ContainerShape containerShape =
-            (ContainerShape) context.getPictogramElement();
+        ContainerShape containerShape = (ContainerShape) context.getPictogramElement();
         GraphicsAlgorithm containerGa = containerShape.getGraphicsAlgorithm();
 
-         // height
+        // height
         if (containerGa.getHeight() < MIN_HEIGHT) {
             containerGa.setHeight(MIN_HEIGHT);
             anythingChanged = true;

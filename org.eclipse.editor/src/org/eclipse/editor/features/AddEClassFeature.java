@@ -48,10 +48,8 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
         IPeCreateService peCreateService = Graphiti.getPeCreateService();
         ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
 
-        // check whether the context has a size (e.g. from a create feature)
-        // otherwise define a default size for the shape
-        int width = context.getWidth() <= 0 ? 100 : context.getWidth();
-        int height = context.getHeight() <= 0 ? 50 : context.getHeight();
+        int width = context.getWidth(); // <= 0 ? 100 : context.getWidth();
+        int height = context.getHeight(); // <= 0 ? 50 : context.getHeight();
     	
         IGaService gaService = Graphiti.getGaService();
 
