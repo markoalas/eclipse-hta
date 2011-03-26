@@ -61,14 +61,13 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
             roundedRectangle.setForeground(manageColor(CLASS_FOREGROUND));
             roundedRectangle.setBackground(manageColor(CLASS_BACKGROUND));
             roundedRectangle.setLineWidth(2);
-            gaService.setLocationAndSize(roundedRectangle,
-                context.getX(), context.getY(), width, height);
+            gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
 
             // if added Class has no resource we add it to the resource
             // of the diagram
             // in a real scenario the business model would have its own resource
             if (addedClass.eResource() == null) {
-                     getDiagram().eResource().getContents().add(addedClass);
+            	getDiagram().eResource().getContents().add(addedClass);
             }
 
             // create link and wire it
@@ -102,6 +101,8 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
             // create link and wire it
             link(shape, addedClass);
         }
+        
+        layoutPictogramElement(containerShape);
 
         return containerShape;
     }
