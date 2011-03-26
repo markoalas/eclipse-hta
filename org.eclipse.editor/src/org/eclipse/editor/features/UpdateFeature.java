@@ -6,6 +6,7 @@ import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -53,26 +54,25 @@ public class UpdateFeature extends AbstractUpdateFeature {
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
 			for (Shape shape : cs.getChildren()) {
-				if (shape.getGraphicsAlgorithm() instanceof Text) {
-					Text text = (Text) shape.getGraphicsAlgorithm();
-					text.setValue(newName);
+				GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+				if (graphicsAlgorithm instanceof Text) {
+					((Text) graphicsAlgorithm).setValue(newName);
 				}
 			}
 		}
 	}
 
 	private String getPictogramName(PictogramElement pictogramElement) {
-		String pictogramName = null;
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
 			for (Shape shape : cs.getChildren()) {
 				if (shape.getGraphicsAlgorithm() instanceof Text) {
 					Text text = (Text) shape.getGraphicsAlgorithm();
-					pictogramName = text.getValue();
+					return text.getValue();
 				}
 			}
 		}
-		return pictogramName;
+		return null;
 	}
 
 	private String getBusinessName(PictogramElement pictogramElement) {

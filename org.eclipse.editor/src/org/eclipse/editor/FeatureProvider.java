@@ -28,10 +28,8 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	
 	@Override
     public IAddFeature getAddFeature(IAddContext context) {
-        // is object for add request a EClass?
         if (context.getNewObject() instanceof EClass) {
             return new AddEClassFeature(this);
-
         }
 
         return super.getAddFeature(context);
