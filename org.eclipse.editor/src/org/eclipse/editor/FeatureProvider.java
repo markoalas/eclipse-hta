@@ -1,21 +1,29 @@
 package org.eclipse.editor;
 
 import org.eclipse.editor.features.AddEClassFeature;
+import org.eclipse.editor.features.AddEReferenceFeature;
+import org.eclipse.editor.features.AssociateDiagramToEClassFeature;
+import org.eclipse.editor.features.CreateEReferenceFeature;
 import org.eclipse.editor.features.CreateFeature;
+import org.eclipse.editor.features.DrillDownFeature;
 import org.eclipse.editor.features.LayoutFeature;
 import org.eclipse.editor.features.RenameFeature;
 import org.eclipse.editor.features.ResizeFeature;
 import org.eclipse.editor.features.UpdateFeature;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
@@ -25,20 +33,32 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	public FeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 	}
-	
-	@Override
-    public IAddFeature getAddFeature(IAddContext context) {
-        if (context.getNewObject() instanceof EClass) {
-            return new AddEClassFeature(this);
-        }
 
-        return super.getAddFeature(context);
-    }
-	
 	@Override
-    public ICreateFeature[] getCreateFeatures() {
-        return new ICreateFeature[] { new CreateFeature(this) };
-    }
+	public IAddFeature getAddFeature(IAddContext context) {
+		if (context.getNewObject() instanceof EClass) {
+			return new AddEClassFeature(this);
+		} else if (context.getNewObject() instanceof EReference) {
+			return new AddEReferenceFeature(this);
+		}
+
+		return super.getAddFeature(context);
+	}
+
+	@Override
+	public ICreateFeature[] getCreateFeatures() {
+		return new ICreateFeature[] { new CreateFeature(this) };
+	}
+
+	@Override
+	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
+		return new ICreateConnectionFeature[] { new CreateEReferenceFeature(this) };
+	}
+
+	@Override
+	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
+		return getCreateConnectionFeatures();
+	}
 
 	@Override
 	public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
@@ -55,8 +75,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 		}
 		return super.getLayoutFeature(context);
 	}
-	
-	
+
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
@@ -67,6 +86,6 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new RenameFeature(this) };
+		return new ICustomFeature[] { new RenameFeature(this), new DrillDownFeature(this), new AssociateDiagramToEClassFeature(this) };
 	}
 }
