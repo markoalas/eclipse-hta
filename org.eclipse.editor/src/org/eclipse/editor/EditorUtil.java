@@ -59,7 +59,7 @@ public class EditorUtil {
 		return ret;
 	}
 
-	private static Diagram getDiagramFromFile(IFile file, ResourceSet resourceSet) {
+	public static Diagram getDiagramFromFile(IFile file, ResourceSet resourceSet) {
 		URI resourceURI = getFileURI(file, resourceSet);
 
 		Resource resource;

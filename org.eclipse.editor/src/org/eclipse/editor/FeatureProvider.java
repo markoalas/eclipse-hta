@@ -27,6 +27,7 @@ import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
 public class FeatureProvider extends DefaultFeatureProvider {
@@ -87,5 +88,10 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
 		return new ICustomFeature[] { new RenameFeature(this), new DrillDownFeature(this), new AssociateDiagramToEClassFeature(this) };
+	}
+
+	@Override
+	public void link(PictogramElement pictogramElement, Object[] businessObjects) {
+		super.link(pictogramElement, businessObjects);
 	}
 }
