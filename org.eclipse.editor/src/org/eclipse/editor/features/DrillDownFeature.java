@@ -24,7 +24,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 
 public class DrillDownFeature extends AbstractDrillDownFeature {
 
