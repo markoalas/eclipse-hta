@@ -1,7 +1,12 @@
 package org.eclipse.editor;
 
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -18,25 +23,28 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
+import com.google.common.base.Function;
+
 public class EditorUtil {
 
-	public static Collection<Diagram> getDiagrams(IProject p) {
-		final List<IFile> files = getDiagramFiles(p);
-		final List<Diagram> diagramList = new ArrayList<Diagram>();
+	public static Iterable<Diagram> getDiagrams(IProject p) {
 		final ResourceSet rSet = new ResourceSetImpl();
 
-		for (IFile file : files) {
-			Diagram diagram = getDiagramFromFile(file, rSet);
-			if (diagram != null) {
-				diagramList.add(diagram);
-			}
-		}
+		return filter(
+				transform(getDiagramFiles(p), getDiagramFromFile(rSet)), 
+				notNull());
+	}
 
-		return diagramList;
+	private static Function<IFile, Diagram> getDiagramFromFile(final ResourceSet rSet) {
+		return new Function<IFile, Diagram>() {
+			@Override
+			public Diagram apply(IFile file) {
+				return getDiagramFromFile(file, rSet);
+			}
+		};
 	}
 
 	private static List<IFile> getDiagramFiles(IContainer folder) {
-
 		List<IFile> ret = new ArrayList<IFile>();
 
 		try {
@@ -62,25 +70,16 @@ public class EditorUtil {
 	public static Diagram getDiagramFromFile(IFile file, ResourceSet resourceSet) {
 		URI resourceURI = getFileURI(file, resourceSet);
 
-		Resource resource;
-
 		try {
-			resource = resourceSet.getResource(resourceURI, true);
+			Resource resource = resourceSet.getResource(resourceURI, true);
 
 			if (resource != null) {
-				// does resource contain a diagram as root object?
 				EList<EObject> contents = resource.getContents();
-
-				for (EObject object : contents) {
-					if (object instanceof Diagram) {
-						return (Diagram) object;
-					}
-				}
+				return (Diagram) find(contents, instanceOf(Diagram.class), null);
 			}
 		} catch (WrappedException e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
 

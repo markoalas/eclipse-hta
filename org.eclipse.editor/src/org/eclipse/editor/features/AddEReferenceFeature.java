@@ -41,10 +41,6 @@ public class AddEReferenceFeature extends AbstractAddFeature {
 	}
 
 	public boolean canAdd(IAddContext context) {
-		if (context instanceof IAddConnectionContext && context.getNewObject() instanceof EReference) {
-			return true;
-		}
-
-		return false;
+		return context instanceof IAddConnectionContext && context.getNewObject() instanceof EReference;
 	}
 }
