@@ -108,18 +108,20 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 	private void createNewDiagramAndOpenIt(ICustomContext context) {
 		try {
 			EClass businessObject = getBusinessObject(context);
-			IFile file = createDiagramFile(businessObject.getName());
 			ResourceSet rSet = new ResourceSetImpl();
+			IFile file = createDiagramFile(businessObject.getName(), rSet);
+			
 			Diagram diagram = EditorUtil.getDiagramFromFile(file, rSet);
 			openEditor(file);
+			Thread.sleep(1000);
 			link(diagram, businessObject);
-			System.out.println("linked");
-		} catch (CoreException e) {
+			System.out.printf("linked diagram %s and %s\n", diagram.getName(), businessObject.getName());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private IFile createDiagramFile(String diagramFileName) throws CoreException {
+	private IFile createDiagramFile(String diagramFileName, ResourceSet rSet) throws CoreException {
 		Resource eResource = getDiagram().eResource();
 
 		String platformString = eResource.getURI().toPlatformString(true);
@@ -130,11 +132,12 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 		IFile file;
 		int nr = 0;
 		do {
-			file = project.getFile("/src/diagrams/" + diagramFileName + " - " + (++nr) + "-subdiagram.diagram");
+			file = project.getFile("/src/diagrams/" + diagramFileName + "-" + (++nr) + "-sub.diagram");
 		} while (file.exists());
 
-		file.create(new ByteArrayInputStream(newFileContents.replaceAll("\"omg\"", "\"" + diagramFileName + " - " + nr + "\"").getBytes()), true, null);
-
+		//file.create(new ByteArrayInputStream(newFileContents.replaceAll("\"omg\"", "\"" + diagramFileName + "-" + nr + "\"").getBytes()), true, null);
+		Resource resource = rSet.createResource(URI.createFileURI(file.getFullPath().toOSString()));
+		
 		return file;
 	}
 
