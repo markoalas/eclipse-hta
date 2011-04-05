@@ -1,32 +1,29 @@
 package org.eclipse.editor.features;
 
 import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Iterables.toArray;
-import static com.google.common.collect.Iterables.transform;
 import static java.util.Arrays.asList;
 
-import java.io.ByteArrayInputStream;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.editor.EditorUtil;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IPeService;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.features.AbstractDrillDownFeature;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -35,11 +32,6 @@ import org.eclipse.ui.ide.IDE;
 import com.google.common.base.Function;
 
 public class DrillDownFeature extends AbstractDrillDownFeature {
-
-	private String newFileContents = "<?xml version=\"1.0\" encoding=\"ASCII\"?>"
-			+ "<pi:Diagram xmi:version=\"2.0\" xmlns:xmi=\"http://www.omg.org/XMI\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:al=\"http://eclipse.org/graphiti/mm/algorithms\" xmlns:pi=\"http://eclipse.org/graphiti/mm/pictograms\" visible=\"true\" gridUnit=\"10\" diagramTypeId=\"org.eclipse.editor.diagramType\" name=\"omg\" snapToGrid=\"true\" showGuides=\"true\">"
-			+ "  <graphicsAlgorithm xsi:type=\"al:Rectangle\" background=\"//@colors.1\" foreground=\"//@colors.0\" width=\"1000\" height=\"1000\"/>"
-			+ "  <colors red=\"227\" green=\"238\" blue=\"249\"/>" + "  <colors red=\"255\" green=\"255\" blue=\"255\"/>" + "</pi:Diagram>";
 
 	public DrillDownFeature(IFeatureProvider fp) {
 		super(fp);
@@ -79,21 +71,8 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 
 	@Override
 	protected Collection<Diagram> getDiagrams() {
-		Resource resource = getDiagram().eResource();
-		URI uri = resource.getURI();
-		URI uriTrimmed = uri.trimFragment();
-
-		if (uriTrimmed.isPlatformResource()) {
-			String platformString = uriTrimmed.toPlatformString(true);
-			IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(platformString);
-
-			if (fileResource != null) {
-				IProject project = fileResource.getProject();
-				return asList(toArray(EditorUtil.getDiagrams(project), Diagram.class));
-			}
-		}
-
-		return Collections.emptyList();
+		Collection<EObject> contents = getDiagram().eResource().getContents();
+		return transform(filter(contents, instanceOf(Diagram.class)), castToDiagram());
 	}
 
 	@Override
@@ -108,41 +87,47 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 	private void createNewDiagramAndOpenIt(ICustomContext context) {
 		try {
 			EClass businessObject = getBusinessObject(context);
-			ResourceSet rSet = new ResourceSetImpl();
-			IFile file = createDiagramFile(businessObject.getName(), rSet);
-			
-			Diagram diagram = EditorUtil.getDiagramFromFile(file, rSet);
-			openEditor(file);
-			Thread.sleep(1000);
-			link(diagram, businessObject);
-			System.out.printf("linked diagram %s and %s\n", diagram.getName(), businessObject.getName());
+			Diagram newDiagram = createNewDiagram(businessObject.getName() + "-sub");
+			openDiagramEditor(newDiagram, getDiagramEditor().getEditingDomain(), getFeatureProvider().getDiagramTypeProvider().getProviderId(), false);
+			link(newDiagram, businessObject);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private IFile createDiagramFile(String diagramFileName, ResourceSet rSet) throws CoreException {
-		Resource eResource = getDiagram().eResource();
+	private Diagram createNewDiagram(String name) throws CoreException {
+		IFeatureProvider featureProvider = getFeatureProvider();
+		Diagram currentDiagram = featureProvider.getDiagramTypeProvider().getDiagram();
+		IPeService peService = Graphiti.getPeService();
+		Diagram newDiagram = peService.createDiagram(currentDiagram.getDiagramTypeId(), name, currentDiagram.isSnapToGrid());
+		currentDiagram.eResource().getContents().add(newDiagram);
 
-		String platformString = eResource.getURI().toPlatformString(true);
-
-		IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(platformString);
-		IProject project = fileResource.getProject();
-
-		IFile file;
-		int nr = 0;
-		do {
-			file = project.getFile("/src/diagrams/" + diagramFileName + "-" + (++nr) + "-sub.diagram");
-		} while (file.exists());
-
-		//file.create(new ByteArrayInputStream(newFileContents.replaceAll("\"omg\"", "\"" + diagramFileName + "-" + nr + "\"").getBytes()), true, null);
-		Resource resource = rSet.createResource(URI.createFileURI(file.getFullPath().toOSString()));
-		
-		return file;
+		return newDiagram;
 	}
 
-	protected void openEditor(IFile file) throws PartInitException {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IDE.openEditor(page, file);
+	public IDiagramEditor openDiagramEditor(Diagram diagram, TransactionalEditingDomain domain, String providerId, boolean disposeEditingDomain) {
+		IDiagramEditor ret = null;
+		DiagramEditorInput diagramEditorInput = DiagramEditorInput.createEditorInput(diagram, domain, providerId, disposeEditingDomain);
+		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		try {
+			IEditorPart editorPart = IDE.openEditor(workbenchPage, diagramEditorInput, DiagramEditor.DIAGRAM_EDITOR_ID);
+			if (editorPart instanceof IDiagramEditor) {
+				ret = (IDiagramEditor) editorPart;
+			}
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+
+	private static Function<Object, Diagram> castToDiagram() {
+		return new Function<Object, Diagram>() {
+			@Override
+			public Diagram apply(Object o) {
+				return (Diagram) o;
+			}
+
+		};
 	}
 }
