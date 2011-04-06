@@ -26,4 +26,15 @@ public class EditorUtil {
 		};
 	}
 
+	public static <T> Function<Object, T> cast(Class<T> clazz) {
+		return new Function<Object, T>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public T apply(Object o) {
+				return (T) o;
+			}
+	
+		};
+	}
+
 }
