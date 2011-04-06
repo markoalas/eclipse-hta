@@ -44,7 +44,7 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 
 	@Override
 	public String getDescription() {
-		return "Open the subdiagram associated with this EClass";
+		return "Open the subdiagram associated with this item";
 	}
 
 	@Override
