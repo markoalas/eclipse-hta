@@ -2,6 +2,7 @@ package org.eclipse.editor;
 
 import org.eclipse.editor.features.AddEClassFeature;
 import org.eclipse.editor.features.AddEReferenceFeature;
+import org.eclipse.editor.features.CreateConnectorFeature;
 import org.eclipse.editor.features.CreateEReferenceFeature;
 import org.eclipse.editor.features.CreateFeature;
 import org.eclipse.editor.features.DrillDownFeature;
@@ -46,7 +47,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { new CreateFeature(this) };
+		return new ICreateFeature[] { new CreateFeature(this), new CreateConnectorFeature(this) };
 	}
 
 	@Override

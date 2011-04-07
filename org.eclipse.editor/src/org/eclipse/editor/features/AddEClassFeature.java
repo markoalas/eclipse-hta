@@ -31,15 +31,9 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
 	}
 
 	public boolean canAdd(IAddContext context) {
-		// check if user wants to add a EClass
-		if (context.getNewObject() instanceof EClass) {
-			// check if user wants to add to a diagram
-			if (context.getTargetContainer() instanceof Diagram) {
-				return true;
-			}
-		}
-
-		return false;
+		return 
+			context.getNewObject() instanceof EClass && 
+			context.getTargetContainer() instanceof Diagram;
 	}
 
 	public PictogramElement add(IAddContext context) {
