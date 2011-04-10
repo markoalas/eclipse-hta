@@ -1,5 +1,6 @@
 package org.eclipse.editor.features;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;
@@ -30,6 +31,7 @@ public class CreateConnectorFeature extends AbstractCreateFeature {
         EClass newClass = EcoreFactory.eINSTANCE.createEClass();
         getDiagram().eResource().getContents().add(newClass);
         newClass.setName(newClassName);
+		
 
         addGraphicalRepresentation(context, newClass);
 

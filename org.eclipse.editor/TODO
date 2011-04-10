@@ -5,3 +5,6 @@ TODO
 * External connectors for subdiagrams
 * Editing of more complex properties
 * Real elements (start, end, state)
+
+
+sample project: git clone git://dev.eclipse.org/org.eclipse.webtools/org.eclipse.jpa.git
