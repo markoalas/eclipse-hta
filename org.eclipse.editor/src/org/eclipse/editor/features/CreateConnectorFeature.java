@@ -30,9 +30,8 @@ public class CreateConnectorFeature extends AbstractCreateFeature {
 
         EClass newClass = EcoreFactory.eINSTANCE.createEClass();
         getDiagram().eResource().getContents().add(newClass);
-        newClass.setName(newClassName);
-		
-
+        newClass.setName("CONNECTOR:" + newClassName);
+        
         addGraphicalRepresentation(context, newClass);
 
         return new Object[] { newClass };

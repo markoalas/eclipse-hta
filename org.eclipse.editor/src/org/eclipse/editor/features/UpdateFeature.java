@@ -1,6 +1,18 @@
 package org.eclipse.editor.features;
 
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+import static org.eclipse.editor.EditorUtil.cast;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
@@ -9,6 +21,7 @@ import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
@@ -30,6 +43,25 @@ public class UpdateFeature extends AbstractUpdateFeature {
 
 		String pictogramName = getPictogramName(pictogramElement);
 		String businessName = getBusinessName(pictogramElement);
+		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+		if (bo instanceof EClass) {
+			EClass eClass = (EClass)bo;
+			if (eClass.getName().equals("Klass")) {
+				EList<EObject> eResourceContents = eClass.eResource().getContents();
+				Collection<Diagram> diagrams = getLinkedDiagrams(pictogramElement, transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
+				Diagram d = diagrams.iterator().next();
+				
+				for (PictogramElement e : d.getChildren()) {
+					Object bo1 = getBusinessObjectForPictogramElement(e);
+					if (bo1 instanceof EClass) {
+						if (((EClass)bo1).getName().startsWith("CONNECTOR:")) {
+							GraphicsAlgorithm graphicsAlgorithm = e.getGraphicsAlgorithm();
+							System.out.println(graphicsAlgorithm.getX() + ":" + graphicsAlgorithm.getY());
+						}
+					}
+				}
+			}
+		}
 
 		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || (pictogramName != null && !pictogramName.equals(businessName)));
 
@@ -38,6 +70,32 @@ public class UpdateFeature extends AbstractUpdateFeature {
 		} else {
 			return Reason.createFalseReason();
 		}
+	}
+	
+	// selle asemel võiks teha getFeatureProvider().getDrillDownFeature() ...
+	protected Collection<Diagram> getLinkedDiagrams(PictogramElement pe, Collection<Diagram> allDiagrams) {
+		final Collection<Diagram> ret = new HashSet<Diagram>();
+
+		final Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
+
+		for (final Diagram d : allDiagrams) {
+			final Diagram currentDiagram = getDiagram();
+			if (!EcoreUtil.equals(currentDiagram, d)) { // always filter out the current
+				// diagram
+				final Object[] businessObjectsForDiagram = getAllBusinessObjectsForPictogramElement(d);
+				for (int i = 0; i < businessObjectsForDiagram.length; i++) {
+					final Object diagramBo = businessObjectsForDiagram[i];
+					for (int j = 0; j < businessObjectsForPictogramElement.length; j++) {
+						final Object currentBo = businessObjectsForPictogramElement[j];
+						if (EcoreUtil.equals((EObject) currentBo, (EObject) diagramBo)) {
+							ret.add(d);
+						}
+					}
+				}
+			}
+		}
+
+		return ret;
 	}
 
 	@Override

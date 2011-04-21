@@ -1,5 +1,10 @@
 package org.eclipse.editor;
 
+
+import static org.eclipse.editor.Log.withLogging;
+
+import org.apache.log4j.Logger;
+import org.eclipse.editor.features.AddConnectorFeature;
 import org.eclipse.editor.features.AddEClassFeature;
 import org.eclipse.editor.features.AddEReferenceFeature;
 import org.eclipse.editor.features.CreateConnectorFeature;
@@ -29,6 +34,7 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+
 public class FeatureProvider extends DefaultFeatureProvider {
 	public FeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
@@ -37,9 +43,11 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
 		if (context.getNewObject() instanceof EClass) {
-			return new AddEClassFeature(this);
+			if (((EClass) context.getNewObject()).getName().startsWith("CONNECTOR:"))
+				return withLogging(IAddFeature.class, new AddConnectorFeature(this));
+			return withLogging(IAddFeature.class, new AddEClassFeature(this));
 		} else if (context.getNewObject() instanceof EReference) {
-			return new AddEReferenceFeature(this);
+			return withLogging(IAddFeature.class, new AddEReferenceFeature(this));
 		}
 
 		return super.getAddFeature(context);
@@ -47,12 +55,12 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { new CreateFeature(this), new CreateConnectorFeature(this) };
+		return new ICreateFeature[] { withLogging(ICreateFeature.class, new CreateFeature(this)), withLogging(ICreateFeature.class, new CreateConnectorFeature(this)) };
 	}
 
 	@Override
 	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] { new CreateEReferenceFeature(this) };
+		return new ICreateConnectionFeature[] { withLogging(ICreateConnectionFeature.class, new CreateEReferenceFeature(this)) };
 	}
 
 	@Override
@@ -63,7 +71,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
 		if (getBusinessObjectForPictogramElement(context.getShape()) instanceof EClass) {
-			return new ResizeFeature(this);
+			return withLogging(IResizeShapeFeature.class, new ResizeFeature(this));
 		}
 		return super.getResizeShapeFeature(context);
 	}
@@ -71,7 +79,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
 		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-			return new LayoutFeature(this);
+			return withLogging(ILayoutFeature.class, new LayoutFeature(this));
 		}
 		return super.getLayoutFeature(context);
 	}
@@ -79,13 +87,13 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-			return new UpdateFeature(this);
+			return withLogging(IUpdateFeature.class, new UpdateFeature(this));
 		}
 		return super.getUpdateFeature(context);
 	}
 
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new RenameFeature(this), new DrillDownFeature(this) };
+		return new ICustomFeature[] { withLogging(ICustomFeature.class, new RenameFeature(this)), withLogging(ICustomFeature.class, new DrillDownFeature(this)) };
 	}
 }

@@ -96,6 +96,14 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
 			link(shape, addedClass);
 		}
 
+		createAnchor(peCreateService, containerShape, gaService);
+
+		layoutPictogramElement(containerShape);
+
+		return containerShape;
+	}
+
+	private void createAnchor(IPeCreateService peCreateService, ContainerShape containerShape, IGaService gaService) {
 		peCreateService.createChopboxAnchor(containerShape);
 		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
 		boxAnchor.setRelativeWidth(1.0);
@@ -114,9 +122,5 @@ public class AddEClassFeature extends AbstractAddShapeFeature {
 		gaService.setLocationAndSize(rectangle, -2 * w, -w, 2 * w, 2 * w);
 		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
 		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
-
-		layoutPictogramElement(containerShape);
-
-		return containerShape;
 	}
 }
