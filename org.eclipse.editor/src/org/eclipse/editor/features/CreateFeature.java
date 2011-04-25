@@ -1,5 +1,6 @@
 package org.eclipse.editor.features;
 
+import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;
@@ -28,6 +29,7 @@ public class CreateFeature extends AbstractCreateFeature {
 
         // create EClass
         EClass newClass = EcoreFactory.eINSTANCE.createEClass();
+        
 
         // Add model element to resource.
         // We add the model element to the resource of the diagram for

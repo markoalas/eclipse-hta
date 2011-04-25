@@ -1,6 +1,6 @@
 package org.eclipse.editor.features;
 
-import org.eclipse.emf.ecore.EClass;
+import org.eclipse.editor.editor.Connector;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -33,12 +33,12 @@ public class AddConnectorFeature extends AbstractAddFeature implements IAddFeatu
 
 	public boolean canAdd(IAddContext context) {
 		return 
-			context.getNewObject() instanceof EClass && 
+			context.getNewObject() instanceof Connector && 
 			context.getTargetContainer() instanceof Diagram;
 	}
 
 	public PictogramElement add(IAddContext context) {
-		EClass addedClass = (EClass) context.getNewObject();
+		Connector addedClass = (Connector) context.getNewObject();
 		Diagram targetDiagram = (Diagram) context.getTargetContainer();
 
 		// CONTAINER SHAPE WITH ROUNDED RECTANGLE

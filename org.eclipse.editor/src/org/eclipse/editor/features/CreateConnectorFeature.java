@@ -1,8 +1,7 @@
 package org.eclipse.editor.features;
 
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.editor.editor.Connector;
+import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -23,18 +22,17 @@ public class CreateConnectorFeature extends AbstractCreateFeature {
     }
 
     public Object[] create(ICreateContext context) {
-        String newClassName = ExampleUtil.askString(TITLE, USER_QUESTION, "");
-        if (newClassName == null || newClassName.trim().length() == 0) {
+        String newConnectorName = ExampleUtil.askString(TITLE, USER_QUESTION, "");
+        if (newConnectorName == null || newConnectorName.trim().length() == 0) {
             return EMPTY;
         }
 
-        EClass newClass = EcoreFactory.eINSTANCE.createEClass();
-        getDiagram().eResource().getContents().add(newClass);
-        newClass.setName("CONNECTOR:" + newClassName);
+        Connector newConnector = EditorFactory.eINSTANCE.createConnector();
+        getDiagram().eResource().getContents().add(newConnector);
+        newConnector.setName(newConnectorName);
         
-        addGraphicalRepresentation(context, newClass);
+        addGraphicalRepresentation(context, newConnector);
 
-        return new Object[] { newClass };
+        return new Object[] { newConnector };
     }
-
 }

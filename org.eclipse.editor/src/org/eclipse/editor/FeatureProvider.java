@@ -4,6 +4,7 @@ package org.eclipse.editor;
 import static org.eclipse.editor.Log.withLogging;
 
 import org.apache.log4j.Logger;
+import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.features.AddConnectorFeature;
 import org.eclipse.editor.features.AddEClassFeature;
 import org.eclipse.editor.features.AddEReferenceFeature;
@@ -43,11 +44,11 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
 		if (context.getNewObject() instanceof EClass) {
-			if (((EClass) context.getNewObject()).getName().startsWith("CONNECTOR:"))
-				return withLogging(IAddFeature.class, new AddConnectorFeature(this));
 			return withLogging(IAddFeature.class, new AddEClassFeature(this));
 		} else if (context.getNewObject() instanceof EReference) {
 			return withLogging(IAddFeature.class, new AddEReferenceFeature(this));
+		} else if (context.getNewObject() instanceof Connector) {
+			return withLogging(IAddFeature.class, new AddConnectorFeature(this));
 		}
 
 		return super.getAddFeature(context);
