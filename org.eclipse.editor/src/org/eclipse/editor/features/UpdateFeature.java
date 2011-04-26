@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.eclipse.editor.editor.Connector;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -45,16 +46,17 @@ public class UpdateFeature extends AbstractUpdateFeature {
 		String businessName = getBusinessName(pictogramElement);
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 		if (bo instanceof EClass) {
-			EClass eClass = (EClass)bo;
+			EClass eClass = (EClass) bo;
 			if (eClass.getName().equals("Klass")) {
 				EList<EObject> eResourceContents = eClass.eResource().getContents();
-				Collection<Diagram> diagrams = getLinkedDiagrams(pictogramElement, transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
-				Diagram d = diagrams.iterator().next();
-				
-				for (PictogramElement e : d.getChildren()) {
-					Object bo1 = getBusinessObjectForPictogramElement(e);
-					if (bo1 instanceof EClass) {
-						if (((EClass)bo1).getName().startsWith("CONNECTOR:")) {
+				Collection<Diagram> diagrams = getLinkedDiagrams(pictogramElement,
+						transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
+				if (diagrams.size() > 0) {
+					Diagram d = diagrams.iterator().next();
+
+					for (PictogramElement e : d.getChildren()) {
+						Object bo1 = getBusinessObjectForPictogramElement(e);
+						if (bo1 instanceof Connector) {
 							GraphicsAlgorithm graphicsAlgorithm = e.getGraphicsAlgorithm();
 							System.out.println(graphicsAlgorithm.getX() + ":" + graphicsAlgorithm.getY());
 						}
@@ -71,7 +73,7 @@ public class UpdateFeature extends AbstractUpdateFeature {
 			return Reason.createFalseReason();
 		}
 	}
-	
+
 	// selle asemel võiks teha getFeatureProvider().getDrillDownFeature() ...
 	protected Collection<Diagram> getLinkedDiagrams(PictogramElement pe, Collection<Diagram> allDiagrams) {
 		final Collection<Diagram> ret = new HashSet<Diagram>();
@@ -80,7 +82,8 @@ public class UpdateFeature extends AbstractUpdateFeature {
 
 		for (final Diagram d : allDiagrams) {
 			final Diagram currentDiagram = getDiagram();
-			if (!EcoreUtil.equals(currentDiagram, d)) { // always filter out the current
+			if (!EcoreUtil.equals(currentDiagram, d)) { // always filter out the
+														// current
 				// diagram
 				final Object[] businessObjectsForDiagram = getAllBusinessObjectsForPictogramElement(d);
 				for (int i = 0; i < businessObjectsForDiagram.length; i++) {

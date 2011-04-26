@@ -1,6 +1,7 @@
 package org.eclipse.editor.features;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -60,6 +61,10 @@ public class CreateEReferenceFeature extends AbstractCreateConnectionFeature {
 			Object object = getBusinessObjectForPictogramElement(anchor.getParent());
 			if (object instanceof EClass) {
 				return (EClass) object;
+			}
+			// todo
+			else if (object instanceof EObject) {
+				return ((EObject)object).eClass();
 			}
 		}
 		

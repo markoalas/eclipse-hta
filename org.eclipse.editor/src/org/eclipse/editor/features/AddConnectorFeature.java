@@ -5,9 +5,7 @@ import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
-import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
@@ -32,93 +30,61 @@ public class AddConnectorFeature extends AbstractAddFeature implements IAddFeatu
 	}
 
 	public boolean canAdd(IAddContext context) {
-		return 
-			context.getNewObject() instanceof Connector && 
-			context.getTargetContainer() instanceof Diagram;
+		return context.getNewObject() instanceof Connector && context.getTargetContainer() instanceof Diagram;
 	}
 
 	public PictogramElement add(IAddContext context) {
-		Connector addedClass = (Connector) context.getNewObject();
+		Connector connector = (Connector) context.getNewObject();
 		Diagram targetDiagram = (Diagram) context.getTargetContainer();
 
-		// CONTAINER SHAPE WITH ROUNDED RECTANGLE
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
-		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
-
-		int width = context.getWidth();
-		int height = context.getHeight();
-
 		IGaService gaService = Graphiti.getGaService();
-
-		{
-			// create and set graphics algorithm
-			RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(containerShape, 5, 5);
-			roundedRectangle.setForeground(manageColor(CLASS_FOREGROUND));
-			roundedRectangle.setBackground(manageColor(CLASS_BACKGROUND));
-			roundedRectangle.setLineWidth(2);
-			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
-
-			// if added Class has no resource we add it to the resource
-			// of the diagram
-			// in a real scenario the business model would have its own resource
-			if (addedClass.eResource() == null) {
-				getDiagram().eResource().getContents().add(addedClass);
-			}
-
-			// create link and wire it
-			link(containerShape, addedClass);
-		}
-
-		// SHAPE WITH LINE
-		{
-			// create shape for line
-			Shape shape = peCreateService.createShape(containerShape, false);
-
-			// create and set graphics algorithm
-			Polyline polyline = gaService.createPolyline(shape, new int[] { 0, 20, width, 20 });
-			polyline.setForeground(manageColor(CLASS_FOREGROUND));
-			polyline.setLineWidth(2);
-		}
-
-		// SHAPE WITH TEXT
-		{
-			// create shape for text
-			Shape shape = peCreateService.createShape(containerShape, false);
-
-			// create and set text graphics algorithm
-			Text text = gaService.createDefaultText(shape, addedClass.getName());
-			text.setForeground(manageColor(CLASS_TEXT_FOREGROUND));
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.getFont().setBold(true);
-			gaService.setLocationAndSize(text, 0, 0, width, 20);
-
-			// create link and wire it
-			link(shape, addedClass);
-		}
-
-		peCreateService.createChopboxAnchor(containerShape);
-		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-		boxAnchor.setRelativeWidth(1.0);
-		boxAnchor.setRelativeHeight(0.5);
-
-		// anchor references visible rectangle instead of invisible rectangle
-		//boxAnchor.setReferencedGraphicsAlgorithm(roundedRectangle);
 		
-		// assign a graphics algorithm for the box relative anchor
-		Rectangle rectangle = gaService.createRectangle(boxAnchor);
-		rectangle.setFilled(true);
+		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
+		link(containerShape, connector);
 
-		// anchor is located on the right border of the visible rectangle
-		// and touches the border of the invisible rectangle
-		int w = 6;
-		gaService.setLocationAndSize(rectangle, -2 * w, -w, 2 * w, 2 * w);
-		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
-		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
+		int width = 50;
+		int height = 40;
+		
+		Rectangle invisibleRect = gaService.createInvisibleRectangle(containerShape);
+		gaService.setLocationAndSize(invisibleRect, context.getX(), context.getY(), width, height);
+
+		if (connector.eResource() == null) {
+			getDiagram().eResource().getContents().add(connector);
+		}
+
+		Shape shape = peCreateService.createShape(containerShape, false);
+		createLabel(gaService, width, connector.getName(), shape);
+		link(shape, connector);
+
+		createAnchor(peCreateService, gaService, containerShape);
 
 		layoutPictogramElement(containerShape);
 
 		return containerShape;
+	}
+
+	private void createLabel(IGaService gaService, int width, String name, Shape shape) {
+		Text text = gaService.createDefaultText(shape, name);
+		text.setForeground(manageColor(CLASS_TEXT_FOREGROUND));
+		text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+		text.setVerticalAlignment(Orientation.ALIGNMENT_TOP);
+		text.getFont().setBold(true);
+		gaService.setLocationAndSize(text, 0, 0, width, 20);
+	}
+
+	private void createAnchor(IPeCreateService peCreateService, IGaService gaService, ContainerShape containerShape) {
+		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
+		boxAnchor.setRelativeWidth(0.5);
+		boxAnchor.setRelativeHeight(1);
+
+		Rectangle rectangle = gaService.createRectangle(boxAnchor);
+		rectangle.setFilled(true);
+
+		int w = 20;
+		gaService.setLocationAndSize(rectangle, -w/2, -w, w, w);
+		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
+		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
 	}
 
 }

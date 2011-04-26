@@ -3,7 +3,6 @@ package org.eclipse.editor;
 
 import static org.eclipse.editor.Log.withLogging;
 
-import org.apache.log4j.Logger;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.features.AddConnectorFeature;
 import org.eclipse.editor.features.AddEClassFeature;
