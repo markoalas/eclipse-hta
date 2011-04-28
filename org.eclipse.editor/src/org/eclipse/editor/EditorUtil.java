@@ -36,5 +36,15 @@ public class EditorUtil {
 	
 		};
 	}
+	
+	public static <T> T coalesce(T... values) {
+		for (T t : values) {
+			if (t != null) {
+				return t;
+			}
+		}
+		
+		return null;
+	}
 
 }

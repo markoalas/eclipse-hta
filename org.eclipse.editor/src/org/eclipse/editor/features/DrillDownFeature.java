@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.editor.Log;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -53,12 +52,12 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 		return getBusinessObject(context) != null;
 	}
 
-	private EClass getBusinessObject(ICustomContext context) {
+	private org.eclipse.editor.editor.Diagram getBusinessObject(ICustomContext context) {
 		List<PictogramElement> pes = asList(context.getPictogramElements());
 		if (pes.size() != 1)
 			return null;
 
-		return (EClass) find(transform(pes, toBusinessObject()), instanceOf(EClass.class), null);
+		return (org.eclipse.editor.editor.Diagram) find(transform(pes, toBusinessObject()), instanceOf(org.eclipse.editor.editor.Diagram.class), null);
 	}
 
 	private Function<PictogramElement, Object> toBusinessObject() {
@@ -87,7 +86,7 @@ public class DrillDownFeature extends AbstractDrillDownFeature {
 
 	private void createNewDiagramAndOpenIt(ICustomContext context) {
 		try {
-			EClass businessObject = getBusinessObject(context);
+			org.eclipse.editor.editor.Diagram businessObject = getBusinessObject(context);
 			Diagram newDiagram = createNewDiagram(businessObject.getName() + "-sub");
 			openDiagramEditor(newDiagram, getDiagramEditor().getEditingDomain(), getFeatureProvider().getDiagramTypeProvider().getProviderId(), false);
 			link(newDiagram, businessObject);

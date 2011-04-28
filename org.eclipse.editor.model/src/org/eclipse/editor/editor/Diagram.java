@@ -22,6 +22,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.eclipse.editor.editor.Diagram#getConnectors <em>Connectors</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.Diagram#getStates <em>States</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.Diagram#getSubdiagrams <em>Subdiagrams</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.Diagram#getEdges <em>Edges</em>}</li>
  * </ul>
  * </p>
  *
@@ -29,7 +30,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Diagram extends EObject {
+public interface Diagram extends EndPoint {
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -89,7 +90,7 @@ public interface Diagram extends EObject {
 	EList<State> getStates();
 
 	/**
-	 * Returns the value of the '<em><b>Subdiagrams</b></em>' reference list.
+	 * Returns the value of the '<em><b>Subdiagrams</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.editor.editor.Diagram}.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -97,11 +98,27 @@ public interface Diagram extends EObject {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Subdiagrams</em>' reference list.
+	 * @return the value of the '<em>Subdiagrams</em>' containment reference list.
 	 * @see org.eclipse.editor.editor.EditorPackage#getDiagram_Subdiagrams()
-	 * @model
+	 * @model containment="true"
 	 * @generated
 	 */
 	EList<Diagram> getSubdiagrams();
+
+	/**
+	 * Returns the value of the '<em><b>Edges</b></em>' containment reference list.
+	 * The list contents are of type {@link org.eclipse.editor.editor.Edge}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Edges</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Edges</em>' containment reference list.
+	 * @see org.eclipse.editor.editor.EditorPackage#getDiagram_Edges()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Edge> getEdges();
 
 } // Diagram

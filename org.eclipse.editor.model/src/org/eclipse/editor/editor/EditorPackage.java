@@ -60,6 +60,25 @@ public interface EditorPackage extends EPackage {
 	EditorPackage eINSTANCE = org.eclipse.editor.editor.impl.EditorPackageImpl.init();
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.editor.editor.EndPoint <em>End Point</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.editor.editor.EndPoint
+	 * @see org.eclipse.editor.editor.impl.EditorPackageImpl#getEndPoint()
+	 * @generated
+	 */
+	int END_POINT = 4;
+
+	/**
+	 * The number of structural features of the '<em>End Point</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int END_POINT_FEATURE_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.StateImpl <em>State</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -76,7 +95,43 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int STATE__NAME = 0;
+	int STATE__NAME = END_POINT_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Invariant</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__INVARIANT = END_POINT_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Initial</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__INITIAL = END_POINT_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Urgent</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__URGENT = END_POINT_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Committed</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__COMMITTED = END_POINT_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>State</em>' class.
@@ -85,7 +140,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int STATE_FEATURE_COUNT = 1;
+	int STATE_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.ConnectorImpl <em>Connector</em>}' class.
@@ -104,7 +159,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTOR__NAME = 0;
+	int CONNECTOR__NAME = END_POINT_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Connector</em>' class.
@@ -113,7 +168,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTOR_FEATURE_COUNT = 1;
+	int CONNECTOR_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.DiagramImpl <em>Diagram</em>}' class.
@@ -132,7 +187,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__NAME = 0;
+	int DIAGRAM__NAME = END_POINT_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Connectors</b></em>' containment reference list.
@@ -141,7 +196,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__CONNECTORS = 1;
+	int DIAGRAM__CONNECTORS = END_POINT_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>States</b></em>' containment reference list.
@@ -150,16 +205,25 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__STATES = 2;
+	int DIAGRAM__STATES = END_POINT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Subdiagrams</b></em>' reference list.
+	 * The feature id for the '<em><b>Subdiagrams</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__SUBDIAGRAMS = 3;
+	int DIAGRAM__SUBDIAGRAMS = END_POINT_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DIAGRAM__EDGES = END_POINT_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Diagram</em>' class.
@@ -168,7 +232,99 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM_FEATURE_COUNT = 4;
+	int DIAGRAM_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 5;
+
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.editor.editor.impl.EdgeImpl
+	 * @see org.eclipse.editor.editor.impl.EditorPackageImpl#getEdge()
+	 * @generated
+	 */
+	int EDGE = 3;
+
+	/**
+	 * The feature id for the '<em><b>Start</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__START = 0;
+
+	/**
+	 * The feature id for the '<em><b>End</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__END = 1;
+
+	/**
+	 * The feature id for the '<em><b>EReference0</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__EREFERENCE0 = 2;
+
+	/**
+	 * The feature id for the '<em><b>Select</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__SELECT = 3;
+
+	/**
+	 * The feature id for the '<em><b>Guard</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__GUARD = 4;
+
+	/**
+	 * The feature id for the '<em><b>Sync</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__SYNC = 5;
+
+	/**
+	 * The feature id for the '<em><b>Update</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__UPDATE = 6;
+
+	/**
+	 * The feature id for the '<em><b>Comments</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE__COMMENTS = 7;
+
+	/**
+	 * The number of structural features of the '<em>Edge</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EDGE_FEATURE_COUNT = 8;
 
 
 	/**
@@ -191,6 +347,50 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getState_Name();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.State#getInvariant <em>Invariant</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Invariant</em>'.
+	 * @see org.eclipse.editor.editor.State#getInvariant()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Invariant();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.State#isInitial <em>Initial</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Initial</em>'.
+	 * @see org.eclipse.editor.editor.State#isInitial()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Initial();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.State#isUrgent <em>Urgent</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Urgent</em>'.
+	 * @see org.eclipse.editor.editor.State#isUrgent()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Urgent();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.State#isCommitted <em>Committed</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Committed</em>'.
+	 * @see org.eclipse.editor.editor.State#isCommitted()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Committed();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.editor.editor.Connector <em>Connector</em>}'.
@@ -257,15 +457,134 @@ public interface EditorPackage extends EPackage {
 	EReference getDiagram_States();
 
 	/**
-	 * Returns the meta object for the reference list '{@link org.eclipse.editor.editor.Diagram#getSubdiagrams <em>Subdiagrams</em>}'.
+	 * Returns the meta object for the containment reference list '{@link org.eclipse.editor.editor.Diagram#getSubdiagrams <em>Subdiagrams</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Subdiagrams</em>'.
+	 * @return the meta object for the containment reference list '<em>Subdiagrams</em>'.
 	 * @see org.eclipse.editor.editor.Diagram#getSubdiagrams()
 	 * @see #getDiagram()
 	 * @generated
 	 */
 	EReference getDiagram_Subdiagrams();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.eclipse.editor.editor.Diagram#getEdges <em>Edges</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Edges</em>'.
+	 * @see org.eclipse.editor.editor.Diagram#getEdges()
+	 * @see #getDiagram()
+	 * @generated
+	 */
+	EReference getDiagram_Edges();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.editor.editor.Edge <em>Edge</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Edge</em>'.
+	 * @see org.eclipse.editor.editor.Edge
+	 * @generated
+	 */
+	EClass getEdge();
+
+	/**
+	 * Returns the meta object for the reference '{@link org.eclipse.editor.editor.Edge#getStart <em>Start</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Start</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getStart()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EReference getEdge_Start();
+
+	/**
+	 * Returns the meta object for the reference '{@link org.eclipse.editor.editor.Edge#getEnd <em>End</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>End</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getEnd()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EReference getEdge_End();
+
+	/**
+	 * Returns the meta object for the reference '{@link org.eclipse.editor.editor.Edge#getEReference0 <em>EReference0</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>EReference0</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getEReference0()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EReference getEdge_EReference0();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Edge#getSelect <em>Select</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Select</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getSelect()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EAttribute getEdge_Select();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Edge#getGuard <em>Guard</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Guard</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getGuard()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EAttribute getEdge_Guard();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Edge#getSync <em>Sync</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Sync</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getSync()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EAttribute getEdge_Sync();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Edge#getUpdate <em>Update</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Update</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getUpdate()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EAttribute getEdge_Update();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Edge#getComments <em>Comments</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Comments</em>'.
+	 * @see org.eclipse.editor.editor.Edge#getComments()
+	 * @see #getEdge()
+	 * @generated
+	 */
+	EAttribute getEdge_Comments();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.editor.editor.EndPoint <em>End Point</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>End Point</em>'.
+	 * @see org.eclipse.editor.editor.EndPoint
+	 * @generated
+	 */
+	EClass getEndPoint();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -306,6 +625,38 @@ public interface EditorPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute STATE__NAME = eINSTANCE.getState_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Invariant</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__INVARIANT = eINSTANCE.getState_Invariant();
+
+		/**
+		 * The meta object literal for the '<em><b>Initial</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__INITIAL = eINSTANCE.getState_Initial();
+
+		/**
+		 * The meta object literal for the '<em><b>Urgent</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__URGENT = eINSTANCE.getState_Urgent();
+
+		/**
+		 * The meta object literal for the '<em><b>Committed</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__COMMITTED = eINSTANCE.getState_Committed();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.editor.editor.impl.ConnectorImpl <em>Connector</em>}' class.
@@ -360,12 +711,104 @@ public interface EditorPackage extends EPackage {
 		EReference DIAGRAM__STATES = eINSTANCE.getDiagram_States();
 
 		/**
-		 * The meta object literal for the '<em><b>Subdiagrams</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Subdiagrams</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference DIAGRAM__SUBDIAGRAMS = eINSTANCE.getDiagram_Subdiagrams();
+
+		/**
+		 * The meta object literal for the '<em><b>Edges</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference DIAGRAM__EDGES = eINSTANCE.getDiagram_Edges();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.editor.editor.impl.EdgeImpl
+		 * @see org.eclipse.editor.editor.impl.EditorPackageImpl#getEdge()
+		 * @generated
+		 */
+		EClass EDGE = eINSTANCE.getEdge();
+
+		/**
+		 * The meta object literal for the '<em><b>Start</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EDGE__START = eINSTANCE.getEdge_Start();
+
+		/**
+		 * The meta object literal for the '<em><b>End</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EDGE__END = eINSTANCE.getEdge_End();
+
+		/**
+		 * The meta object literal for the '<em><b>EReference0</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EDGE__EREFERENCE0 = eINSTANCE.getEdge_EReference0();
+
+		/**
+		 * The meta object literal for the '<em><b>Select</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EDGE__SELECT = eINSTANCE.getEdge_Select();
+
+		/**
+		 * The meta object literal for the '<em><b>Guard</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EDGE__GUARD = eINSTANCE.getEdge_Guard();
+
+		/**
+		 * The meta object literal for the '<em><b>Sync</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EDGE__SYNC = eINSTANCE.getEdge_Sync();
+
+		/**
+		 * The meta object literal for the '<em><b>Update</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EDGE__UPDATE = eINSTANCE.getEdge_Update();
+
+		/**
+		 * The meta object literal for the '<em><b>Comments</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EDGE__COMMENTS = eINSTANCE.getEdge_Comments();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.editor.editor.EndPoint <em>End Point</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.editor.editor.EndPoint
+		 * @see org.eclipse.editor.editor.impl.EditorPackageImpl#getEndPoint()
+		 * @generated
+		 */
+		EClass END_POINT = eINSTANCE.getEndPoint();
 
 	}
 

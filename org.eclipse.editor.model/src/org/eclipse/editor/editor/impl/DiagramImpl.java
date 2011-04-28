@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Diagram;
+import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.EditorPackage;
 import org.eclipse.editor.editor.State;
 
@@ -39,6 +40,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getConnectors <em>Connectors</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getStates <em>States</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getSubdiagrams <em>Subdiagrams</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getEdges <em>Edges</em>}</li>
  * </ul>
  * </p>
  *
@@ -86,7 +88,7 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	protected EList<State> states;
 
 	/**
-	 * The cached value of the '{@link #getSubdiagrams() <em>Subdiagrams</em>}' reference list.
+	 * The cached value of the '{@link #getSubdiagrams() <em>Subdiagrams</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getSubdiagrams()
@@ -94,6 +96,16 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 * @ordered
 	 */
 	protected EList<Diagram> subdiagrams;
+
+	/**
+	 * The cached value of the '{@link #getEdges() <em>Edges</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getEdges()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Edge> edges;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -166,9 +178,21 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 */
 	public EList<Diagram> getSubdiagrams() {
 		if (subdiagrams == null) {
-			subdiagrams = new EObjectResolvingEList<Diagram>(Diagram.class, this, EditorPackage.DIAGRAM__SUBDIAGRAMS);
+			subdiagrams = new EObjectContainmentEList<Diagram>(Diagram.class, this, EditorPackage.DIAGRAM__SUBDIAGRAMS);
 		}
 		return subdiagrams;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Edge> getEdges() {
+		if (edges == null) {
+			edges = new EObjectContainmentEList<Edge>(Edge.class, this, EditorPackage.DIAGRAM__EDGES);
+		}
+		return edges;
 	}
 
 	/**
@@ -183,6 +207,10 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				return ((InternalEList<?>)getConnectors()).basicRemove(otherEnd, msgs);
 			case EditorPackage.DIAGRAM__STATES:
 				return ((InternalEList<?>)getStates()).basicRemove(otherEnd, msgs);
+			case EditorPackage.DIAGRAM__SUBDIAGRAMS:
+				return ((InternalEList<?>)getSubdiagrams()).basicRemove(otherEnd, msgs);
+			case EditorPackage.DIAGRAM__EDGES:
+				return ((InternalEList<?>)getEdges()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -203,6 +231,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				return getStates();
 			case EditorPackage.DIAGRAM__SUBDIAGRAMS:
 				return getSubdiagrams();
+			case EditorPackage.DIAGRAM__EDGES:
+				return getEdges();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -231,6 +261,10 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				getSubdiagrams().clear();
 				getSubdiagrams().addAll((Collection<? extends Diagram>)newValue);
 				return;
+			case EditorPackage.DIAGRAM__EDGES:
+				getEdges().clear();
+				getEdges().addAll((Collection<? extends Edge>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -255,6 +289,9 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 			case EditorPackage.DIAGRAM__SUBDIAGRAMS:
 				getSubdiagrams().clear();
 				return;
+			case EditorPackage.DIAGRAM__EDGES:
+				getEdges().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -275,6 +312,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				return states != null && !states.isEmpty();
 			case EditorPackage.DIAGRAM__SUBDIAGRAMS:
 				return subdiagrams != null && !subdiagrams.isEmpty();
+			case EditorPackage.DIAGRAM__EDGES:
+				return edges != null && !edges.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

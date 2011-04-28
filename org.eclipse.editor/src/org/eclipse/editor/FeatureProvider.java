@@ -1,22 +1,24 @@
 package org.eclipse.editor;
 
-
 import static org.eclipse.editor.Log.withLogging;
 
 import org.eclipse.editor.editor.Connector;
+import org.eclipse.editor.editor.Edge;
+import org.eclipse.editor.editor.State;
 import org.eclipse.editor.features.AddConnectorFeature;
-import org.eclipse.editor.features.AddEClassFeature;
-import org.eclipse.editor.features.AddEReferenceFeature;
+import org.eclipse.editor.features.AddStateFeature;
+import org.eclipse.editor.features.AddEdgeFeature;
+import org.eclipse.editor.features.AddSubdiagramFeature;
 import org.eclipse.editor.features.CreateConnectorFeature;
-import org.eclipse.editor.features.CreateEReferenceFeature;
-import org.eclipse.editor.features.CreateFeature;
+import org.eclipse.editor.features.CreateEdgeFeature;
+import org.eclipse.editor.features.CreateStateFeature;
+import org.eclipse.editor.features.CreateSubdiagramFeature;
 import org.eclipse.editor.features.DrillDownFeature;
-import org.eclipse.editor.features.LayoutFeature;
+import org.eclipse.editor.features.LayoutSubdiagramFeature;
 import org.eclipse.editor.features.RenameFeature;
 import org.eclipse.editor.features.ResizeFeature;
 import org.eclipse.editor.features.UpdateFeature;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
@@ -34,7 +36,6 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-
 public class FeatureProvider extends DefaultFeatureProvider {
 	public FeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
@@ -42,10 +43,12 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
-		if (context.getNewObject() instanceof EClass) {
-			return withLogging(IAddFeature.class, new AddEClassFeature(this));
-		} else if (context.getNewObject() instanceof EReference) {
-			return withLogging(IAddFeature.class, new AddEReferenceFeature(this));
+		if (context.getNewObject() instanceof State) {
+			return withLogging(IAddFeature.class, new AddStateFeature(this));
+		} else if (context.getNewObject() instanceof Edge) {
+			return withLogging(IAddFeature.class, new AddEdgeFeature(this));
+		} else if (context.getNewObject() instanceof org.eclipse.editor.editor.Diagram) {
+			return withLogging(IAddFeature.class, new AddSubdiagramFeature(this));
 		} else if (context.getNewObject() instanceof Connector) {
 			return withLogging(IAddFeature.class, new AddConnectorFeature(this));
 		}
@@ -55,12 +58,13 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { withLogging(ICreateFeature.class, new CreateFeature(this)), withLogging(ICreateFeature.class, new CreateConnectorFeature(this)) };
+		return new ICreateFeature[] { withLogging(ICreateFeature.class, new CreateStateFeature(this)),
+				withLogging(ICreateFeature.class, new CreateConnectorFeature(this)), withLogging(ICreateFeature.class, new CreateSubdiagramFeature(this)) };
 	}
 
 	@Override
 	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] { withLogging(ICreateConnectionFeature.class, new CreateEReferenceFeature(this)) };
+		return new ICreateConnectionFeature[] { withLogging(ICreateConnectionFeature.class, new CreateEdgeFeature(this)) };
 	}
 
 	@Override
@@ -79,7 +83,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
 		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-			return withLogging(ILayoutFeature.class, new LayoutFeature(this));
+			return withLogging(ILayoutFeature.class, new LayoutSubdiagramFeature(this));
 		}
 		return super.getLayoutFeature(context);
 	}

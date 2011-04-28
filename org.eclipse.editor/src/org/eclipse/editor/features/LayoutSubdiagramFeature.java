@@ -1,7 +1,7 @@
 package org.eclipse.editor.features;
 
+import org.eclipse.editor.editor.Diagram;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -16,17 +16,16 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 
-public class LayoutFeature extends AbstractLayoutFeature {
+public class LayoutSubdiagramFeature extends AbstractLayoutFeature {
 
 	private static final int MIN_HEIGHT = 30;
     private static final int MIN_WIDTH = 50;
 
-    public LayoutFeature(IFeatureProvider fp) {
+    public LayoutSubdiagramFeature(IFeatureProvider fp) {
         super(fp);
     }
 
     public boolean canLayout(ILayoutContext context) {
-       // return true, if pictogram element is linked to an EClass
        PictogramElement pe = context.getPictogramElement();
 
        if (!(pe instanceof ContainerShape))
@@ -34,7 +33,7 @@ public class LayoutFeature extends AbstractLayoutFeature {
 
        EList<EObject> businessObjects = pe.getLink().getBusinessObjects();
        return businessObjects.size() == 1 
-              && businessObjects.get(0) instanceof EClass;
+              && businessObjects.get(0) instanceof Diagram;
     }
 
     public boolean layout(ILayoutContext context) {

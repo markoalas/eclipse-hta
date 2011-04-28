@@ -8,6 +8,7 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -73,7 +74,7 @@ public class AddConnectorFeature extends AbstractAddFeature implements IAddFeatu
 		gaService.setLocationAndSize(text, 0, 0, width, 20);
 	}
 
-	private void createAnchor(IPeCreateService peCreateService, IGaService gaService, ContainerShape containerShape) {
+	private Anchor createAnchor(IPeCreateService peCreateService, IGaService gaService, ContainerShape containerShape) {
 		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
 		boxAnchor.setRelativeWidth(0.5);
 		boxAnchor.setRelativeHeight(1);
@@ -85,6 +86,8 @@ public class AddConnectorFeature extends AbstractAddFeature implements IAddFeatu
 		gaService.setLocationAndSize(rectangle, -w/2, -w, w, w);
 		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
 		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
+		
+		return boxAnchor;
 	}
 
 }

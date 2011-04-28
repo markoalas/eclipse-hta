@@ -24,6 +24,10 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.eclipse.editor.editor.impl.StateImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.StateImpl#getInvariant <em>Invariant</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.StateImpl#isInitial <em>Initial</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.StateImpl#isUrgent <em>Urgent</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.StateImpl#isCommitted <em>Committed</em>}</li>
  * </ul>
  * </p>
  *
@@ -49,6 +53,86 @@ public class StateImpl extends EObjectImpl implements State {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getInvariant() <em>Invariant</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInvariant()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String INVARIANT_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getInvariant() <em>Invariant</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInvariant()
+	 * @generated
+	 * @ordered
+	 */
+	protected String invariant = INVARIANT_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isInitial() <em>Initial</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isInitial()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean INITIAL_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isInitial() <em>Initial</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isInitial()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean initial = INITIAL_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isUrgent() <em>Urgent</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isUrgent()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean URGENT_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isUrgent() <em>Urgent</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isUrgent()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean urgent = URGENT_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isCommitted() <em>Committed</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isCommitted()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean COMMITTED_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isCommitted() <em>Committed</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isCommitted()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean committed = COMMITTED_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -95,11 +179,103 @@ public class StateImpl extends EObjectImpl implements State {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getInvariant() {
+		return invariant;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInvariant(String newInvariant) {
+		String oldInvariant = invariant;
+		invariant = newInvariant;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.STATE__INVARIANT, oldInvariant, invariant));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isInitial() {
+		return initial;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInitial(boolean newInitial) {
+		boolean oldInitial = initial;
+		initial = newInitial;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.STATE__INITIAL, oldInitial, initial));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isUrgent() {
+		return urgent;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setUrgent(boolean newUrgent) {
+		boolean oldUrgent = urgent;
+		urgent = newUrgent;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.STATE__URGENT, oldUrgent, urgent));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isCommitted() {
+		return committed;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCommitted(boolean newCommitted) {
+		boolean oldCommitted = committed;
+		committed = newCommitted;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.STATE__COMMITTED, oldCommitted, committed));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case EditorPackage.STATE__NAME:
 				return getName();
+			case EditorPackage.STATE__INVARIANT:
+				return getInvariant();
+			case EditorPackage.STATE__INITIAL:
+				return isInitial();
+			case EditorPackage.STATE__URGENT:
+				return isUrgent();
+			case EditorPackage.STATE__COMMITTED:
+				return isCommitted();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -114,6 +290,18 @@ public class StateImpl extends EObjectImpl implements State {
 		switch (featureID) {
 			case EditorPackage.STATE__NAME:
 				setName((String)newValue);
+				return;
+			case EditorPackage.STATE__INVARIANT:
+				setInvariant((String)newValue);
+				return;
+			case EditorPackage.STATE__INITIAL:
+				setInitial((Boolean)newValue);
+				return;
+			case EditorPackage.STATE__URGENT:
+				setUrgent((Boolean)newValue);
+				return;
+			case EditorPackage.STATE__COMMITTED:
+				setCommitted((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -130,6 +318,18 @@ public class StateImpl extends EObjectImpl implements State {
 			case EditorPackage.STATE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
+			case EditorPackage.STATE__INVARIANT:
+				setInvariant(INVARIANT_EDEFAULT);
+				return;
+			case EditorPackage.STATE__INITIAL:
+				setInitial(INITIAL_EDEFAULT);
+				return;
+			case EditorPackage.STATE__URGENT:
+				setUrgent(URGENT_EDEFAULT);
+				return;
+			case EditorPackage.STATE__COMMITTED:
+				setCommitted(COMMITTED_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -144,6 +344,14 @@ public class StateImpl extends EObjectImpl implements State {
 		switch (featureID) {
 			case EditorPackage.STATE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case EditorPackage.STATE__INVARIANT:
+				return INVARIANT_EDEFAULT == null ? invariant != null : !INVARIANT_EDEFAULT.equals(invariant);
+			case EditorPackage.STATE__INITIAL:
+				return initial != INITIAL_EDEFAULT;
+			case EditorPackage.STATE__URGENT:
+				return urgent != URGENT_EDEFAULT;
+			case EditorPackage.STATE__COMMITTED:
+				return committed != COMMITTED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -160,6 +368,14 @@ public class StateImpl extends EObjectImpl implements State {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (Name: ");
 		result.append(name);
+		result.append(", Invariant: ");
+		result.append(invariant);
+		result.append(", Initial: ");
+		result.append(initial);
+		result.append(", Urgent: ");
+		result.append(urgent);
+		result.append(", Committed: ");
+		result.append(committed);
 		result.append(')');
 		return result.toString();
 	}

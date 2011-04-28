@@ -1,6 +1,6 @@
 package org.eclipse.editor.features;
 
-import org.eclipse.emf.ecore.EReference;
+import org.eclipse.editor.editor.Edge;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -13,16 +13,16 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.IColorConstant;
 
-public class AddEReferenceFeature extends AbstractAddFeature {
+public class AddEdgeFeature extends AbstractAddFeature {
 
-	public AddEReferenceFeature(IFeatureProvider fp) {
+	public AddEdgeFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
 	public PictogramElement add(IAddContext context) {
 
 		IAddConnectionContext addConContext = (IAddConnectionContext) context;
-		EReference addedEReference = (EReference) context.getNewObject();
+		Edge addedEdge = (Edge) context.getNewObject();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 
 		// CONNECTION WITH POLYLINE
@@ -35,12 +35,12 @@ public class AddEReferenceFeature extends AbstractAddFeature {
 		polyline.setForeground(manageColor(IColorConstant.BLACK));
 
 		// create link and wire it
-		link(connection, addedEReference);
+		link(connection, addedEdge);
 
 		return connection;
 	}
 
 	public boolean canAdd(IAddContext context) {
-		return context instanceof IAddConnectionContext && context.getNewObject() instanceof EReference;
+		return context instanceof IAddConnectionContext && context.getNewObject() instanceof Edge;
 	}
 }

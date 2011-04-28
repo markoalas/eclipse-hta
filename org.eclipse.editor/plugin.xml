@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.graphiti.ui.diagramTypes">
+   <extension point="org.eclipse.graphiti.ui.diagramTypes">
       <diagramType
             id="org.eclipse.editor.diagramType"
-            name="org.eclipse.editor.diagramType"
+            name="HTA Diagram"
             type="org.eclipse.editor.diagramType">
       </diagramType>
    </extension>
-   <extension
-         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+   
+   <extension point="org.eclipse.graphiti.ui.diagramTypeProviders">
       <diagramTypeProvider
             class="org.eclipse.editor.DiagramTypeProvider"
             id="org.eclipse.editor.diagramTypeProvider"
@@ -18,5 +17,27 @@
             <diagramType id="org.eclipse.editor.diagramType"/>
       </diagramTypeProvider>
    </extension>
+   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor contributorId="org.eclipse.editor.diagramType.PropertyContributor">
+          <propertyCategory category="Graphiti">
+          </propertyCategory>
+      </propertyContributor>
+   </extension>
 
+  <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="org.eclipse.editor.diagramType.PropertyContributor">
+          <propertyTab label="Main" category="Graphiti" id="graphiti.main.tab">
+          </propertyTab>
+      </propertyTabs>
+  </extension>
+
+  <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.editor.diagramType.PropertyContributor">
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.StatePropertySection"
+           filter="org.eclipse.editor.StatePropertyFilter"
+           id="graphiti.main.tab.state">
+          </propertySection>
+      </propertySections>
+  </extension>
 </plugin>

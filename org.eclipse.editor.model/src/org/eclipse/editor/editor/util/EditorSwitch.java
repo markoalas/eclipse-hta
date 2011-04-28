@@ -90,18 +90,33 @@ public class EditorSwitch<T> {
 			case EditorPackage.STATE: {
 				State state = (State)theEObject;
 				T result = caseState(state);
+				if (result == null) result = caseEndPoint(state);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case EditorPackage.CONNECTOR: {
 				Connector connector = (Connector)theEObject;
 				T result = caseConnector(connector);
+				if (result == null) result = caseEndPoint(connector);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case EditorPackage.DIAGRAM: {
 				Diagram diagram = (Diagram)theEObject;
 				T result = caseDiagram(diagram);
+				if (result == null) result = caseEndPoint(diagram);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case EditorPackage.EDGE: {
+				Edge edge = (Edge)theEObject;
+				T result = caseEdge(edge);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case EditorPackage.END_POINT: {
+				EndPoint endPoint = (EndPoint)theEObject;
+				T result = caseEndPoint(endPoint);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -151,6 +166,36 @@ public class EditorSwitch<T> {
 	 * @generated
 	 */
 	public T caseDiagram(Diagram object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Edge</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Edge</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEdge(Edge object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>End Point</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>End Point</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEndPoint(EndPoint object) {
 		return null;
 	}
 

@@ -7,7 +7,6 @@ import static org.eclipse.editor.EditorUtil.cast;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.emf.common.util.EList;

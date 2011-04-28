@@ -63,6 +63,7 @@ public class EditorFactoryImpl extends EFactoryImpl implements EditorFactory {
 			case EditorPackage.STATE: return createState();
 			case EditorPackage.CONNECTOR: return createConnector();
 			case EditorPackage.DIAGRAM: return createDiagram();
+			case EditorPackage.EDGE: return createEdge();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -96,6 +97,16 @@ public class EditorFactoryImpl extends EFactoryImpl implements EditorFactory {
 	public Diagram createDiagram() {
 		DiagramImpl diagram = new DiagramImpl();
 		return diagram;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Edge createEdge() {
+		EdgeImpl edge = new EdgeImpl();
+		return edge;
 	}
 
 	/**
