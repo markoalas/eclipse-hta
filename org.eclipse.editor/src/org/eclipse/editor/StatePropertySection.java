@@ -58,7 +58,7 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 				// TODO this needs to be done in a write transaction
 				if (!getStateObject().getName().equals(nameText.getText())) {
 					
-					new org.eclipse.emf.edit.command.ChangeCommand()
+					//new org.eclipse.emf.edit.command.ChangeCommand()
 					getStateObject().setName(nameText.getText());
 				}
 			}
