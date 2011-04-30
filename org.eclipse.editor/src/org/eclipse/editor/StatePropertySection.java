@@ -2,7 +2,6 @@ package org.eclipse.editor;
 
 import static org.eclipse.editor.EditorUtil.coalesce;
 
-import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.editor.editor.State;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -57,7 +56,6 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 			public void modifyText(ModifyEvent arg0) {
 				// TODO this needs to be done in a write transaction
 				if (!getStateObject().getName().equals(nameText.getText())) {
-					
 					//new org.eclipse.emf.edit.command.ChangeCommand()
 					getStateObject().setName(nameText.getText());
 				}

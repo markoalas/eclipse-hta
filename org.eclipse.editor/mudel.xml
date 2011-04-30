@@ -1,0 +1,23 @@
+<!DOCTYPE hta SYSTEM "huppaal-1.1.dtd">
+<hta>
+	<template type="XOR">
+		<name>Template</name>
+		<location id="location1" kind="entry" x="10" y="20">
+			<name>A</name>
+		</location>
+		<location id="location2" kind="basic" x="15" y="20">
+			<name>B</name>
+		</location>
+		<location id="location3" kind="exit" x="20" y="20">
+			<name>C</name>
+		</location>
+		<transition>
+			<source ref="location1"/>
+			<target ref="location2"/>
+		</transition>
+	</template>
+	<system>
+		system Template;
+	</system>
+	<globalinit instantiationname="Template" ref="location1"/>
+</hta>

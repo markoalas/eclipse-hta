@@ -1,0 +1,4 @@
+#!/bin/bash
+
+java -cp crimson.jar:JAXP_144.jar:serializer.jar:vanilla-1.jar:xalan.jar:xercesImpl.jar:xml-apis.jar:xsltc.jar Flatten ../org.eclipse.editor/mudel.xml
+
