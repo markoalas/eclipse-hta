@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Here are the declarations...
+
+// ----- Translation Slack ----- 
+chan  xtSglNR2;
+chan  TmpltENTRYtrtmplt2;
+</declaration><template><name x="0" y="0">globalKickoff3</name><location id="id0" x="40" y="40"><name x="60" y="20">start</name><committed/></location><location id="id1" x="340" y="20"><name x="360" y="0">L1</name></location><init ref="id0"/><transition><source ref="id0"/><target ref="id1"/><label kind="synchronisation" x="185" y="41">TmpltENTRYtrtmplt2!</label></transition></template><template><name x="0" y="0">template2</name><location id="id2" x="40" y="40"><name x="60" y="20">A</name></location><location id="id3" x="340" y="20"><name x="360" y="0">B</name></location><location id="id4" x="20" y="340"><name x="40" y="320">C</name></location><location id="id5" x="640" y="120"><name x="660" y="100">IDLE</name></location><init ref="id5"/><transition><source ref="id5"/><target ref="id2"/><label kind="synchronisation" x="380" y="94">TmpltENTRYtrtmplt2?</label></transition><transition><source ref="id2"/><target ref="id3"/></transition><transition><source ref="id3"/><target ref="id4"/></transition><transition><source ref="id2"/><target ref="id5"/><label kind="synchronisation" x="320" y="86">xtSglNR2?</label></transition><transition><source ref="id3"/><target ref="id5"/><label kind="synchronisation" x="485" y="75">xtSglNR2?</label></transition><transition><source ref="id4"/><target ref="id5"/><label kind="synchronisation" x="309" y="251">xtSglNR2?</label></transition></template><system>//template2 = template2();
+//globalKickoff3 = globalKickoff3();
+system template2, globalKickoff3;
+</system></nta>

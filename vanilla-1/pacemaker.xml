@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+<!-- Pacemaker Example						   --> 
+<!--  	 							   --> 
+<!-- Basically as described in  				   --> 
+<!-- 	 							   --> 
+<!-- Bruce Powel Douglas: "Doing Hard Real-Time", pp 619           --> 
+<!-- 	 							   --> 
+<!-- 	 							   --> 
+<!-- Synopsis:							   --> 
+<!--  hierarchical uppaal					   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+<!-- @TABLE OF CONTENTS:		 [TOCD: 19:45 24 Mar 2001] --> 
+<!--								   --> 
+<!--  [1] The Pacemaker (with all subcomponents)		   --> 
+<!--      [1.1] VVI MODE					   --> 
+<!--      [1.2] AVI Mode: Parallel Submachines			   --> 
+<!--          [1.2.1] AVI Part A				   --> 
+<!--          [1.2.2] AVI Part V				   --> 
+<!--  [2] The Heart						   --> 
+<!--  [3] The Programmer (who sets the  Pacemaker mode)		   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<!-- @FILE:    pacemaker.xml   		   		           --> 
+<!-- @PLACE:   BRICS AArhus; host:harald			   --> 
+<!-- @FORMAT:  XML						   --> 
+<!-- @AUTHOR:  M. Oliver M'o'ller     <omoeller@brics.dk>	   --> 
+<!-- @BEGUN:   Sun Feb 25 18:53:37 2001				   --> 
+<!-- @VERSION: Wed Apr  4 12:31:44 2001				   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+ 
+<!DOCTYPE hta  SYSTEM "http://www.brics.dk/~omoeller/hta/xml/huppaal-0.6.dtd"> 
+<hta> 
+  <declaration> 
+// Clocks
+clock  VVI_TIME;
+clock  VVT_TIME;
+clock  AVI_A_TIME;
+clock  AVI_V_TIME;
+ 
+clock  HEART_TIME;
+clock  PROGRAMMER_TIME;
+ 
+ 
+// Channels encoding Events
+chan commandedOn; 
+chan commandedOff; 
+chan toIdle; 
+chan toInhibited;
+chan toTriggered;
+chan toAVI;
+ 
+chan APace;
+chan VPace;
+ 
+chan AVI_Refractory_Done;
+chan AVI_APace;
+chan AVI_APace_Done;
+chan AVI_Sense_from_V;
+ 
+urgent chan VentricularChamberSense;
+//urgent chan AtrialChamberSense; // nobody is listening
+urgent chan EnablePaceElectronics;
+urgent chan DisablePaceElectronics;
+ 
+ 
+// user interactions: Heart
+ 
+urgent chan stopHeartBeat;
+urgent chan startHeartBeat;
+ 
+// diagnostic
+ 
+int[0,1] wasSwitchedOff;
+ 
+// ------------------------------ Auxiallry:
+ 
+// anybody listening to VentricularChamberSense?
+int[0,1] V_listening;
+int[0,1] A_LISTENING_TO_V;
+ 
+// -- Constant Parameters ------------------------------
+ 
+const REFRACTORY_TIME 50;
+const SENSE_TIMEOUT   15;
+ 
+const HEART_DELAY_AFTER_V_CONTRACTION 50;
+const HEART_DELAY_AFTER_A_CONTRACTION  5;
+ 
+const HEART_ALLOWED_STOP_TIME 135;
+ 
+const MODE_SWITCH_DELAY 66;
+ 
+// ----------------------------------------------------------------------
+ 
+const ALLOW_SWITCH_OFF 1;
+ 
+ 
+</declaration> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- [1] The Pacemaker (with all subcomponents)			       --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+ 
+<template type="XOR" > 
+      <name x="0" y="16">Pacemaker</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries/exits --> 
+      <entry id="Pace.AVI.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry-on (AVI)</name> 
+           <connection> 
+                <target ref="Pace.On" entryref="Pace.On.AVI.ENTRY"/> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.VVI.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry-On (VVI)</name> 
+           <connection> 
+                <target ref="Pace.On"
+                        entryref="Pace.On.VVI.ENTRY"/> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.VVT.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry-On (VVT)</name> 
+           <connection> 
+                <target ref="Pace.On"
+                        entryref="Pace.On.VVT.ENTRY"/> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.Idle.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry-On (Idle)</name> 
+           <connection> 
+                <target ref="Pace.On"
+                        entryref="Pace.On.Idle.ENTRY"/> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.Off.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry-Off</name> 
+           <connection> 
+                <target ref="Pace.Off" /> 
+           </connection> 
+      </entry> 
+    <!-- declare the locations --> 
+    <location id="Pace.Off" x="1632" y="280"> 
+      <name x="1622" y="250">Off</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <!-- non-atomic locations (components) --> 
+    <component instantiates="Pace-On-TEMPLATE" id="Pace.On" > 
+        <name x="1622" y="250">subComponent</name> 
+        <label kind="invariant"></label> 
+    </component> 
+    <!-- declare the transitions                     --> 
+    <transition> 
+      <source ref="Pace.Off" /> 
+      <target ref="Pace.On"
+              entryref="Pace.On.default.ENTRY" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">commandedOn?</label> 
+       <label kind="assignment"  x="1312" y="1600"></label> 
+    </transition> 
+      <transition> 
+      <source ref="Pace.On"
+              exitref="Pace.On.default.EXIT" /> 
+      <target ref="Pace.Off" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">commandedOff?</label> 
+       <label kind="assignment"  x="1312" y="1600">V_listening := 0, wasSwitchedOff := 1</label> 
+    </transition> 
+      <!-- Switching Modes --> 
+    <transition> 
+      <source ref="Pace.On"
+              exitref="Pace.On.default.EXIT" /> 
+      <target ref="Pace.On" entryref="Pace.On.Idle.ENTRY" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">toIdle?</label> 
+       <label kind="assignment"  x="1312" y="1600">V_listening := 0, wasSwitchedOff := 1</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On"
+              exitref="Pace.On.default.EXIT" /> 
+      <target ref="Pace.On" entryref="Pace.On.VVI.ENTRY" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">toInhibited?</label> 
+       <label kind="assignment"  x="1312" y="1600">V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On"
+              exitref="Pace.On.default.EXIT" /> 
+      <target ref="Pace.On" entryref="Pace.On.VVT.ENTRY" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">toTriggered?</label> 
+       <label kind="assignment"  x="1312" y="1600">V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On"
+              exitref="Pace.On.default.EXIT" /> 
+      <target ref="Pace.On" entryref="Pace.On.AVI.ENTRY" /> 
+       <label kind="guard"  x="1316" y="1594"></label> 
+       <label kind="synchronisation"  x="1392" y="1600">toAVI?</label> 
+       <label kind="assignment"  x="1312" y="1600">V_listening := 0</label> 
+    </transition>  
+</template> 
+<!-- the subcomponent that encodes the running modes --> 
+<template type="XOR" > 
+      <name x="0" y="16">Pace-On-TEMPLATE</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries/exits --> 
+      <entry id="Pace.On.default.ENTRY" x="0" y="0" type="default"> 
+           <name x="0" y="16">default entry</name> 
+           <connection> 
+              <target ref="Pace.On.VVI" entryref="Pace.On.VVI.default.ENTRY"/> 
+              <label kind="assignment">VVI_TIME := 0</label> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.On.Idle.ENTRY" x="0" y="0"> 
+           <name x="0" y="16">enter Idle Mode</name> 
+           <connection> 
+              <target ref="Pace.On.Idle" /> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.On.VVI.ENTRY" x="0" y="0"> 
+           <name x="0" y="16">enter Inhibited Mode</name> 
+           <connection> 
+              <target ref="Pace.On.VVI" entryref="Pace.On.VVI.default.ENTRY"/> 
+              <label kind="assignment">VVI_TIME := 0</label> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.On.VVT.ENTRY" x="0" y="0"> 
+           <name x="0" y="16">enter Inhibited Mode</name> 
+           <connection> 
+              <target ref="Pace.On.VVT" entryref="Pace.On.VVT.default.ENTRY"/> 
+              <label kind="assignment">VVT_TIME := 0</label> 
+           </connection> 
+      </entry> 
+      <entry id="Pace.On.AVI.ENTRY" x="0" y="0"> 
+           <name x="0" y="16">enter Inhibited Mode</name> 
+           <connection> 
+              <target ref="Pace.On.AVI" entryref="Pace.On.AVI.default.ENTRY"/> 
+              <label kind="assignment">AVI_A_TIME := 0, AVI_V_TIME := 0</label> 
+           </connection> 
+      </entry> 
+    <!-- declare the exits                     --> 
+ 
+    <exit id="Pace.On.default.EXIT" x="0" y="0" type="default-exit" > 
+           <name x="0" y="16">DefaultExit</name> 
+    </exit> 
+ 
+    <!-- declare the locations --> 
+    <location id="Pace.On.Idle" x="1632" y="280"> 
+      <name x="1622" y="250">Idle</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <!-- non-atomic locations (components) --> 
+    <component instantiates="Pace-On-VVI-TEMPLATE" id="Pace.On.VVI" > 
+        <name x="1622" y="250">VVI Mode</name> 
+        <label kind="invariant"></label> 
+    </component> 
+    <component instantiates="Pace-On-VVT-TEMPLATE" id="Pace.On.VVT" > 
+        <name x="1622" y="250">VVT Mode</name> 
+        <label kind="invariant"></label> 
+    </component> 
+    <component instantiates="Pace-On-AVI-TEMPLATE" id="Pace.On.AVI" > 
+        <name x="1622" y="250">AVI Mode</name> 
+        <label kind="invariant"></label> 
+    </component>  
+    <!-- declare the transitions                     --> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<!-- [1.1] ~~ VVI MODE ~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+ 
+<template type="XOR" > 
+      <name x="0" y="16">Pace-On-VVI-TEMPLATE</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries/exits --> 
+      <entry id="Pace.On.VVI.default.ENTRY" x="0" y="0" type="default"> 
+           <name x="0" y="16">default entry</name> 
+           <connection> 
+              <target ref="Pace.On.VVI.Refractory" /> 
+              <label kind="assignment"  x="1312" y="1600">VVI_TIME := 0</label> 
+           </connection> 
+      </entry> 
+    <!-- declare the exits                     --> 
+    <exit id="Pace.On.VVI.default.EXIT" x="0" y="0" type="default-exit" > 
+          <name x="0" y="16">DefaultExit</name> 
+          <connection> 
+             <label kind="assignment">V_listening := 0</label> 
+          </connection> 
+    </exit> 
+    <!-- declare the locations --> 
+    <location id="Pace.On.VVI.Refractory" x="1632" y="280"> 
+      <name x="1622" y="250">Refractory</name> 
+      <label kind="invariant" x="1622" y="295" >VVI_TIME &lt;= REFRACTORY_TIME</label> 
+    </location> 
+    <location id="Pace.On.VVI.Waiting_for_Sense" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting_for_Sense</name> 
+      <label kind="invariant" x="1622" y="295" >VVI_TIME &lt;= SENSE_TIMEOUT</label> 
+    </location>  
+    <location id="Pace.On.VVI.Waiting_for_Sense_AUX" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting_for_Sense_AUX</name> 
+      <label kind="invariant" x="1622" y="295" >VVI_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Pace.On.VVI.Pacing" x="1632" y="280"> 
+      <name x="1622" y="250">Pacing</name> 
+      <label kind="invariant" x="1622" y="295" >VVI_TIME &lt;= 0</label> 
+    </location> 
+    <!-- non-atomic locations components --> 
+    <!-- declare the transitions                     --> 
+    <transition> 
+      <source ref="Pace.On.VVI.Refractory" /> 
+      <target ref="Pace.On.VVI.Waiting_for_Sense" /> 
+      <label kind="guard"  x="1316" y="1594">VVI_TIME == REFRACTORY_TIME</label> 
+      <label kind="synchronisation"  x="1392" y="1600" /> 
+      <label kind="assignment"  x="1312" y="1600">VVI_TIME := 0, V_listening := 1</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVI.Waiting_for_Sense" /> 
+      <target ref="Pace.On.VVI.Waiting_for_Sense" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="synchronisation"  x="1392" y="1600">VentricularChamberSense?</label> 
+      <label kind="assignment"  x="1312" y="1600">VVI_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVI.Waiting_for_Sense" /> 
+      <target ref="Pace.On.VVI.Waiting_for_Sense_AUX" /> 
+      <label kind="guard"  x="1316" y="1594">VVI_TIME == SENSE_TIMEOUT</label> 
+      <label kind="assignment"  x="1312" y="1600">VVI_TIME := 0, V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVI.Waiting_for_Sense_AUX" /> 
+      <target ref="Pace.On.VVI.Pacing" /> 
+      <label kind="synchronisation"  x="1392" y="1600">VPace!</label> 
+      <label kind="assignment"  x="1312" y="1600">VVI_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVI.Pacing" /> 
+      <target ref="Pace.On.VVI.Refractory" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="assignment"  x="1312" y="1600"></label> 
+    </transition> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<!-- VVT Mode					   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+ 
+<template type="XOR" > 
+      <name x="0" y="16">Pace-On-VVT-TEMPLATE</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries/exits --> 
+      <entry id="Pace.On.VVT.default.ENTRY" x="0" y="0" type="default"> 
+           <name x="0" y="16">default entry</name> 
+           <connection> 
+              <target ref="Pace.On.VVT.Refractory" />      
+              <label kind="assignment"  x="1312" y="1600">VVT_TIME := 0</label> 
+           </connection> 
+      </entry> 
+    <!-- declare the exits                     --> 
+    <exit id="Pace.On.VVT.default.EXIT" x="0" y="0" type="default-exit" > 
+           <name x="0" y="16">DefaultExit</name> 
+          <connection> 
+             <label kind="assignment">V_listening := 0</label> 
+          </connection> 
+ 
+    </exit> 
+    <!-- declare the locations --> 
+    <location id="Pace.On.VVT.Refractory" x="1632" y="280"> 
+      <name x="1622" y="250">Refractory</name> 
+      <label kind="invariant" x="1622" y="295" >VVT_TIME &lt;= REFRACTORY_TIME</label> 
+    </location> 
+    <location id="Pace.On.VVT.Waiting_for_Sense" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting_for_Sense</name> 
+      <label kind="invariant" x="1622" y="295" >VVT_TIME &lt;= SENSE_TIMEOUT</label> 
+    </location>  
+    <location id="Pace.On.VVT.Waiting_for_Sense_AUX" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting_for_Sense_AUX</name> 
+      <label kind="invariant" x="1622" y="295" >VVT_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Pace.On.VVT.Pacing" x="1632" y="280"> 
+      <name x="1622" y="250">Pacing</name> 
+      <label kind="invariant" x="1622" y="295" >VVT_TIME &lt;= 0</label> 
+    </location> 
+    <!-- non-atomic locations components --> 
+    <!-- declare the transitions                     --> 
+    <transition> 
+      <source ref="Pace.On.VVT.Refractory" /> 
+      <target ref="Pace.On.VVT.Waiting_for_Sense" /> 
+      <label kind="guard"  x="1316" y="1594">VVT_TIME == REFRACTORY_TIME</label> 
+      <label kind="synchronisation"  x="1392" y="1600" /> 
+      <label kind="assignment"  x="1312" y="1600">VVT_TIME := 0, V_listening := 1</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVT.Waiting_for_Sense" /> 
+      <target ref="Pace.On.VVT.Waiting_for_Sense_AUX" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="synchronisation"  x="1392" y="1600">VentricularChamberSense?</label> 
+      <label kind="assignment"  x="1312" y="1600">VVT_TIME := 0,V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVT.Waiting_for_Sense" /> 
+      <target ref="Pace.On.VVT.Waiting_for_Sense_AUX" /> 
+      <label kind="guard"  x="1316" y="1594">VVT_TIME == SENSE_TIMEOUT</label> 
+      <label kind="assignment"  x="1312" y="1600">VVT_TIME := 0, V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVT.Waiting_for_Sense_AUX" /> 
+      <target ref="Pace.On.VVT.Pacing" /> 
+      <label kind="synchronisation"  x="1392" y="1600">VPace!</label> 
+      <label kind="assignment"  x="1312" y="1600">VVT_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.VVT.Pacing" /> 
+      <target ref="Pace.On.VVT.Refractory" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="assignment"  x="1312" y="1600"></label> 
+    </transition> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<!-- [1.2] ~~ AVI Mode: Parallel Submachines~      --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<template type="AND"> 
+   <name x="0" y="16">Pace-On-AVI-TEMPLATE</name> 
+    <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries/exits --> 
+    <entry id="Pace.On.AVI.default.ENTRY" x="0" y="0" type="default"> 
+           <name x="0" y="16">default entry</name> 
+	   <connection> 
+	      <target ref="Pace.On.AVI.default.FORK" /> 
+              <label kind="assigment">A_LISTENING_TO_V := 0</label> 
+	   </connection>            
+    </entry> 
+    <!-- the fork -->  
+    <fork id="Pace.On.AVI.default.FORK"> 
+           <connection> 
+             <target ref="Pace.On.AVI.A-Part.COMPONENT"
+                     entryref="Pace.On.AVI.A-Part.default.ENTRY" /> 
+           </connection> 
+	   <connection> 
+             <target ref="Pace.On.AVI.V-Part.COMPONENT"
+                     entryref="Pace.On.AVI.V-Part.default.ENTRY" /> 
+           </connection>        
+    </fork> 
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    <exit id="Pace.On.AVI.default.EXIT"> 
+          <name>default exit</name> 
+	  <connection>    
+            <source ref="Pace.On.AVI.default.JOIN" /> 
+            <label kind="assignment">V_listening := 0</label> 
+	  </connection> 
+    </exit> 
+      <join id="Pace.On.AVI.default.JOIN"> 
+           <connection> 
+             <source ref="Pace.On.AVI.A-Part.COMPONENT"
+                     exitref="Pace.On.AVI.A-Part.default.EXIT" /> 
+           </connection> 
+	   <connection> 
+             <source ref="Pace.On.AVI.V-Part.COMPONENT"
+                     exitref="Pace.On.AVI.V-Part.default.EXIT" /> 
+           </connection>   
+    </join> 
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    <component id="Pace.On.AVI.A-Part.COMPONENT"
+               instantiates="Pace-On-AVI-A-Part-TEMPLATE"> 
+       <name>A-Part</name> 
+    </component> 
+    <component id="Pace.On.AVI.V-Part.COMPONENT"
+               instantiates="Pace-On-AVI-V-Part-TEMPLATE"> 
+       <name>V-Part</name> 
+    </component> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	 --> 
+<!-- [1.2.1] AVI Part A			 --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	 --> 
+<template type="XOR"> 
+      <name>Pace-On-AVI-A-Part-TEMPLATE</name> 
+      <parameter></parameter> 
+          <!-- local variables --> 
+      <declaration></declaration> 
+     <!-- declare the entries/exits --> 
+      <entry id="Pace.On.AVI.A-Part.default.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry</name> 
+           <connection> 
+                <target ref="Pace.On.AVI.A-Part.refractory.LOCATION" /> 
+                <label kind="assignment">AVI_A_TIME := 0</label>  
+           </connection> 
+      </entry> 
+      <exit type="default-exit" id="Pace.On.AVI.A-Part.default.EXIT"> 
+            <name>default-exit</name> 
+      </exit> 
+    <!-- declare the locations --> 
+    <location id="Pace.On.AVI.A-Part.refractory.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">Refractory</name> 
+      <label kind="invariant" x="1622" y="295">AVI_A_TIME &lt;= REFRACTORY_TIME</label> 
+    </location> 
+    <location id="Pace.On.AVI.A-Part.waiting.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting</name> 
+      <label kind="invariant" x="1622" y="295">AVI_A_TIME &lt;= SENSE_TIMEOUT</label> 
+    </location> 
+    <location id="Pace.On.AVI.A-Part.apacing.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">A Pacing</name> 
+      <label kind="invariant" x="1622" y="295">AVI_A_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Pace.On.AVI.A-Part.apacing_AUX.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">A Pacing AUX</name> 
+      <label kind="invariant" x="1622" y="295">AVI_A_TIME &lt;= 0</label> 
+    </location>  
+    <!-- transitions here --> 
+    <transition> 
+      <source ref="Pace.On.AVI.A-Part.refractory.LOCATION" /> 
+      <target ref="Pace.On.AVI.A-Part.waiting.LOCATION" /> 
+      <label kind="guard" x="1622" y="295">AVI_A_TIME == REFRACTORY_TIME</label> 
+      <label kind="synchronisation" x="1622" y="295">AVI_Refractory_Done!</label> 
+      <label kind="assignment" x="1622" y="295">A_LISTENING_TO_V := 1, AVI_A_TIME := 0</label> 
+ 
+    </transition>     
+    <transition> 
+      <source ref="Pace.On.AVI.A-Part.waiting.LOCATION" /> 
+      <target ref="Pace.On.AVI.A-Part.waiting.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_Sense_from_V?</label> 
+      <label kind="assignment" x="1622" y="295">AVI_A_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.AVI.A-Part.waiting.LOCATION" /> 
+      <target ref="Pace.On.AVI.A-Part.apacing.LOCATION" /> 
+      <label kind="guard" x="1622" y="295">AVI_A_TIME == SENSE_TIMEOUT</label> 
+      <label kind="synchronisation" x="1622" y="295">APace!</label> 
+      <label kind="assignment" x="1622" y="295">A_LISTENING_TO_V := 0, AVI_A_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.AVI.A-Part.apacing.LOCATION" /> 
+      <target ref="Pace.On.AVI.A-Part.apacing_AUX.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_APace!</label> 
+      <label kind="assignment" x="1622" y="295">AVI_A_TIME := 0</label> 
+    </transition>  
+    <transition> 
+      <source ref="Pace.On.AVI.A-Part.apacing_AUX.LOCATION" /> 
+      <target ref="Pace.On.AVI.A-Part.refractory.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_APace_Done!</label> 
+      <label kind="assignment" x="1622" y="295">AVI_A_TIME := 0</label> 
+    </transition> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	 --> 
+<!-- [1.2.2] AVI Part V			 --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	 --> 
+<template type="XOR"> 
+      <name>Pace-On-AVI-V-Part-TEMPLATE</name> 
+      <parameter></parameter> 
+          <!-- local variables --> 
+      <declaration></declaration> 
+     <!-- declare the entries/exits --> 
+      <entry id="Pace.On.AVI.V-Part.default.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">entry</name> 
+           <connection> 
+                <target ref="Pace.On.AVI.V-Part.refractory.LOCATION" /> 
+                <label kind="assignment">AVI_V_TIME := 0</label>  
+           </connection> 
+      </entry> 
+      <exit type="default-exit" id="Pace.On.AVI.V-Part.default.EXIT"> 
+            <name>default exit</name> 
+      </exit> 
+    <!-- declare the locations --> 
+    <location id="Pace.On.AVI.V-Part.refractory.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">Refractory</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <location id="Pace.On.AVI.V-Part.waiting.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <location id="Pace.On.AVI.V-Part.waiting_AUX.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">Waiting AUX</name> 
+      <label kind="invariant" x="1622" y="295" >AVI_V_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Pace.On.AVI.V-Part.apacing.LOCATION" x="1632" y="280"> 
+      <name x="1622" y="250">A Pacing</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <!-- transitions here --> 
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.refractory.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.waiting.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_Refractory_Done?</label> 
+      <label kind="assignment" x="1622" y="295">V_listening := 1</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.waiting.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.waiting_AUX.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">VentricularChamberSense?</label> 
+      <label kind="assignment" x="1622" y="295">AVI_V_TIME := 0, V_listening := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.waiting_AUX.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.waiting.LOCATION" /> 
+      <label kind="guard" x="1622" y="295">A_LISTENING_TO_V == 0</label> 
+      <label kind="assignment" x="1622" y="295">V_listening := 1</label> 
+    </transition> 
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.waiting_AUX.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.waiting.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_Sense_from_V!</label> 
+      <label kind="assignment" x="1622" y="295">V_listening := 1</label> 
+    </transition>  
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.waiting.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.apacing.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_APace?</label> 
+      <label kind="assignment" x="1622" y="295">V_listening := 0</label> 
+    </transition>  
+    <transition> 
+      <source ref="Pace.On.AVI.V-Part.apacing.LOCATION" /> 
+      <target ref="Pace.On.AVI.V-Part.refractory.LOCATION" /> 
+      <label kind="synchronisation" x="1622" y="295">AVI_APace_Done?</label> 
+    </transition> 
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- [2] The Heart						       --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<template type="XOR" > 
+      <name x="0" y="16">Heart</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries --> 
+      <entry id="Heart.VContraction.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">V Beat Entry</name> 
+           <connection> 
+              <target ref="Heart.Detail"
+                      entryref="Heart.Detail.VContraction.ENTRY" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+      </entry> 
+      <entry id="Heart.AContraction.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">A Beat Entry</name> 
+           <connection> 
+              <target ref="Heart.Detail"
+                      entryref="Heart.Detail.AContraction.ENTRY" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+      </entry> 
+    <!-- DEFAULT EXIT (optional) --> 
+      <exit type="default-exit" id="Heart.default.EXIT"> 
+            <name>default exit</name> 
+      </exit> 
+    <!-- declare the (only) non-basic location --> 
+    <component id="Heart.Detail" x="0" y="0"
+               instantiates="Heart-Detail-TEMPLATE"   
+      > 
+      <name x="1622" y="250">Detail</name> 
+    </component> 
+    <!-- declare the re-entering transitions --> 
+    <transition> 
+      <source ref="Heart.Detail"
+              exitref="Heart.Detail.default.EXIT"/> 
+      <target ref="Heart.Detail"
+              entryref="Heart.Detail.AContraction.ENTRY" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="synchronisation"  x="1392" y="1600">APace?</label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Heart.Detail"
+              exitref="Heart.Detail.default.EXIT"/> 
+      <target ref="Heart.Detail"
+              entryref="Heart.Detail.VContraction.ENTRY" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="synchronisation"  x="1392" y="1600">VPace?</label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+    </transition>  
+</template> 
+<template type="XOR" > 
+      <name x="0" y="16">Heart-Detail-TEMPLATE</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries --> 
+      <entry id="Heart.Detail.VContraction.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">Detail V Beat Entry</name> 
+           <connection> 
+              <target ref="Heart.Detail.VContraction" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" >HEART_TIME := 0</label>       
+            </connection> 
+      </entry> 
+      <entry id="Heart.Detail.AContraction.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">A Beat Entry</name> 
+           <connection> 
+              <target ref="Heart.Detail.AContraction" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" >HEART_TIME := 0</label>       
+            </connection> 
+      </entry> 
+    <!-- ~~ default exit ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+      <exit id="Heart.Detail.default.EXIT" x="0" y="0" type="default-exit" > 
+           <name x="0" y="16">DefaultExit</name> 
+      </exit> 
+    <!-- declare the locations --> 
+    <location id="Heart.Detail.VContraction" x="1632" y="280"> 
+      <name x="1622" y="250">VContraction</name> 
+      <label kind="invariant" x="1622" y="295" >HEART_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Heart.Detail.AContraction" x="1632" y="280"> 
+      <name x="1622" y="250">AContraction</name> 
+      <label kind="invariant" x="1622" y="295" >HEART_TIME &lt;= 0</label> 
+    </location> 
+    <location id="Heart.Detail.VContracted" x="1632" y="280"> 
+      <name x="1622" y="250">After_V_Contraction</name> 
+      <label kind="invariant" x="1622" y="295" >HEART_TIME &lt;= HEART_DELAY_AFTER_V_CONTRACTION</label> 
+    </location> 
+    <location id="Heart.Detail.AContracted" x="1632" y="280"> 
+      <name x="1622" y="250">After_A_Contraction</name> 
+      <label kind="invariant" x="1622" y="295" >HEART_TIME &lt;= HEART_DELAY_AFTER_A_CONTRACTION</label> 
+    </location>  
+    <location id="Heart.Detail.Stopped" x="1328" y="280"> 
+      <name x="1318" y="250">Stopped</name> 
+      <label kind="invariant" x="1318" y="296">HEART_TIME &lt;= HEART_ALLOWED_STOP_TIME</label> 
+    </location> 
+    <location id="Heart.Detail.Flatline" x="1328" y="280"> 
+      <name x="1318" y="250">Flatline</name> 
+      <label kind="invariant" x="1318" y="296" /> 
+    </location> 
+    <!-- declare the transitions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    <transition> 
+      <source ref="Heart.Detail.AContraction" /> 
+      <target ref="Heart.Detail.AContracted" /> 
+    </transition> 
+    <transition> 
+      <source ref="Heart.Detail.AContracted" /> 
+      <target ref="Heart.Detail.VContraction" /> 
+      <label kind="guard"  x="1316" y="1594">HEART_TIME == HEART_DELAY_AFTER_A_CONTRACTION</label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+</transition>  
+    <transition> 
+      <source ref="Heart.Detail.VContraction" /> 
+      <target ref="Heart.Detail.VContracted" /> 
+      <label kind="guard"  x="1316" y="1594">V_listening == 0</label> 
+      <label kind="assignment"  x="1312" y="1600"></label> 
+    </transition> 
+    <transition> 
+      <source ref="Heart.Detail.VContraction" /> 
+      <target ref="Heart.Detail.VContracted" /> 
+      <label kind="guard"  x="1316" y="1594">V_listening == 1</label> 
+      <label kind="synchronisation"  x="1392" y="1600">VentricularChamberSense!</label> 
+      <label kind="assignment"  x="1312" y="1600"></label> 
+    </transition>  
+    <transition> 
+      <source ref="Heart.Detail.VContracted" /> 
+      <target ref="Heart.Detail.AContraction" /> 
+      <label kind="guard"  x="1316" y="1594">HEART_TIME == HEART_DELAY_AFTER_V_CONTRACTION</label> 
+      <label kind="synchronisation"  x="1392" y="1600"></label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Heart.Detail.VContracted" /> 
+      <target ref="Heart.Detail.Stopped" /> 
+      <label kind="guard"  x="1316" y="1594"></label> 
+      <label kind="synchronisation"  x="1392" y="1600"></label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Heart.Detail.Stopped" /> 
+      <target ref="Heart.Detail.Flatline" /> 
+      <label kind="guard"  x="1316" y="1594">HEART_TIME == HEART_ALLOWED_STOP_TIME</label> 
+      <label kind="synchronisation"  x="1392" y="1600"></label> 
+      <label kind="assignment"  x="1312" y="1600">HEART_TIME := 0</label> 
+    </transition>  
+</template> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- [3] The Programmer (who sets the  Pacemaker mode)		       --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<template type="XOR" > 
+      <name x="0" y="16">Programmer</name> 
+      <parameter x="125" y="16"></parameter> 
+    <!-- local variables --> 
+      <declaration></declaration> 
+    <!-- declare the entries --> 
+      <entry id="Programmer.Idle.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">Start Entry</name> 
+           <connection> 
+              <target ref="Programmer.Idle" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+      </entry> 
+      <entry id="Programmer.Random.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">Random Entry</name> 
+           <connection> 
+              <target ref="Programmer.Random" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+      </entry> 
+      <entry id="Programmer.Modeswitch.ENTRY" x="0" y="0" > 
+           <name x="0" y="16">Modeswitch Entry</name> 
+           <connection> 
+              <target ref="Programmer.Modeswitch" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+      </entry> 
+    <!-- exits: are global, i.e. the programmer goes home --> 
+    <exit id="Programmer.Modeswitch.EXIT" x="0" y="0" > 
+           <name x="0" y="16">Modeswitch Exit</name> 
+           <connection> 
+              <source ref="Programmer.Modeswitch" /> 
+              <label kind="guard" ></label> 
+              <label kind="assignment" ></label>       
+            </connection> 
+    </exit>  
+    <!-- declare the locations --> 
+    <location id="Programmer.Idle" x="1632" y="280"> 
+      <name x="1622" y="250">Idle</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <location id="Programmer.Random" x="1632" y="280"> 
+      <name x="1622" y="250">Random</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <location id="Programmer.Modeswitch" x="1632" y="280"> 
+      <name x="1622" y="250">Modeswitch</name> 
+      <label kind="invariant" x="1622" y="295" /> 
+    </location> 
+    <location id="Programmer.Modeswitch.Delay" x="1632" y="280"> 
+      <name x="1622" y="250">Modeswitch-Delay</name> 
+      <label kind="invariant" x="1622" y="295">PROGRAMMER_TIME &lt;= MODE_SWITCH_DELAY</label> 
+    </location> 
+    <!-- declare the transitions --> 
+    <transition> 
+      <source ref="Programmer.Random" /> 
+      <target ref="Programmer.Random" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">commandedOn!</label> 
+      <label kind="assignment"  x="1316" y="1594" ></label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Random" /> 
+      <target ref="Programmer.Random" /> 
+      <label kind="guard"  x="1316" y="1594" >ALLOW_SWITCH_OFF == 1</label> 
+      <label kind="synchronisation"  x="1392" y="1600">commandedOff!</label> 
+      <label kind="assignment"  x="1316" y="1594" ></label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Random" /> 
+      <target ref="Programmer.Random" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">toInhibited!</label> 
+      <label kind="assignment"  x="1316" y="1594" ></label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Random" /> 
+      <target ref="Programmer.Random" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">toTriggered!</label> 
+      <label kind="assignment"  x="1316" y="1594" ></label> 
+    </transition> 
+<!-- ~~ MODE-SWITCHING PROGRAMMER ~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">toInhibited!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">toTriggered!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" >ALLOW_SWITCH_OFF == 1</label> 
+      <label kind="synchronisation"  x="1392" y="1600">commandedOff!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">commandedOn!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition>  
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" ></label> 
+      <label kind="synchronisation"  x="1392" y="1600">toAVI!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Modeswitch" /> 
+      <target ref="Programmer.Modeswitch.Delay" /> 
+      <label kind="guard"  x="1316" y="1594" >ALLOW_SWITCH_OFF == 1</label> 
+      <label kind="synchronisation"  x="1392" y="1600">toIdle!</label> 
+      <label kind="assignment"  x="1316" y="1594" >PROGRAMMER_TIME :=0</label> 
+    </transition> 
+    <transition> 
+      <source ref="Programmer.Modeswitch.Delay" /> 
+      <target ref="Programmer.Modeswitch" /> 
+      <label kind="guard"  x="1316" y="1594" >PROGRAMMER_TIME == MODE_SWITCH_DELAY</label> 
+      <label kind="synchronisation"  x="1392" y="1600"></label> 
+      <label kind="assignment"  x="1316" y="1594" ></label> 
+    </transition> 
+</template> 
+ 
+ 
+<instantiation> 
+  pacemaker := Pacemaker();
+  heart_sim := Heart();
+  programmer_sim  := Programmer();
+ </instantiation> 
+         <!-- pacemaker, heart_sim, programmer_sim; --> 
+ <system> 
+       system pacemaker, programmer_sim, heart_sim;
+ </system> 
+ <!-- declare the init points --> 
+ <globalinit instantiationname="pacemaker" ref="Pace.AVI.ENTRY" /> 
+ <globalinit instantiationname="heart_sim" ref="Heart.AContraction.ENTRY"
+       canexit="no" /> 
+ <globalinit instantiationname="programmer_sim"
+      ref="Programmer.Modeswitch.ENTRY" 
+      canexit="specified" > 
+      <connection> 
+        <source ref="Programmer.Modeswitch.EXIT"
+                exitref="Programmer.Modeswitch.EXIT" /> 
+      </connection> 
+ </globalinit> 
+</hta> 

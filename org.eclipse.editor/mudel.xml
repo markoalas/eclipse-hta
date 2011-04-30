@@ -1,23 +1,52 @@
-<!DOCTYPE hta SYSTEM "huppaal-1.1.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hta SYSTEM "huppaal-0.6.dtd">
 <hta>
+	<declaration>
+		// Here are the declarations...
+	</declaration>
 	<template type="XOR">
 		<name>Template</name>
-		<location id="location1" kind="entry" x="10" y="20">
+		<declaration>
+			// Here are local declarations for Template
+		</declaration>
+		
+		<entry id="Template.ENTRY" x="10" y="20">
+			<name>A</name>
+			<connection> 
+                <target ref="Template.A" /> 
+            </connection>
+		</entry>
+		
+		<exit id="Template.ENTRY" x="20" y="20" type="default-exit">
+			<name>C</name>
+		</exit>
+		
+		<location id="Template.A" x="10" y="20">
 			<name>A</name>
 		</location>
-		<location id="location2" kind="basic" x="15" y="20">
+		
+		<location id="Template.B" x="15" y="20">
 			<name>B</name>
 		</location>
-		<location id="location3" kind="exit" x="20" y="20">
+		
+		<location id="Template.C" x="20" y="20">
 			<name>C</name>
 		</location>
+		
 		<transition>
-			<source ref="location1"/>
-			<target ref="location2"/>
+			<source ref="Template.A"/>
+			<target ref="Template.B"/>
+		</transition>
+		<transition>
+			<source ref="Template.B"/>
+			<target ref="Template.C"/>
 		</transition>
 	</template>
+	<instantiation>
+		template := Template();
+	</instantiation>
 	<system>
-		system Template;
+		system template;
 	</system>
-	<globalinit instantiationname="Template" ref="location1"/>
+	<globalinit instantiationname="template" ref="Template.ENTRY"/>
 </hta>
