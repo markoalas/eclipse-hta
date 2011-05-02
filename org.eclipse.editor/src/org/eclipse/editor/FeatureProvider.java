@@ -6,7 +6,6 @@ import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.features.RenameFeature;
-import org.eclipse.editor.features.ResizeFeature;
 import org.eclipse.editor.features.connector.AddConnectorFeature;
 import org.eclipse.editor.features.connector.CreateConnectorFeature;
 import org.eclipse.editor.features.edge.AddEdgeFeature;
@@ -16,22 +15,16 @@ import org.eclipse.editor.features.state.CreateStateFeature;
 import org.eclipse.editor.features.subdiagram.AddSubdiagramFeature;
 import org.eclipse.editor.features.subdiagram.CreateSubdiagramFeature;
 import org.eclipse.editor.features.subdiagram.DrillDownFeature;
-import org.eclipse.editor.features.subdiagram.LayoutSubdiagramFeature;
 import org.eclipse.editor.features.subdiagram.UpdateDiagramFeature;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeature;
-import org.eclipse.graphiti.features.ILayoutFeature;
-import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
-import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
@@ -72,21 +65,21 @@ public class FeatureProvider extends DefaultFeatureProvider {
 		return getCreateConnectionFeatures();
 	}
 
-	@Override
-	public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
-		if (getBusinessObjectForPictogramElement(context.getShape()) instanceof EClass) {
-			return withLogging(IResizeShapeFeature.class, new ResizeFeature(this));
-		}
-		return super.getResizeShapeFeature(context);
-	}
-
-	@Override
-	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
-		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-			return withLogging(ILayoutFeature.class, new LayoutSubdiagramFeature(this));
-		}
-		return super.getLayoutFeature(context);
-	}
+//	@Override
+//	public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
+//		if (getBusinessObjectForPictogramElement(context.getShape()) instanceof EClass) {
+//			return withLogging(IResizeShapeFeature.class, new ResizeFeature(this));
+//		}
+//		return super.getResizeShapeFeature(context);
+//	}
+//
+//	@Override
+//	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
+//		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
+//			return withLogging(ILayoutFeature.class, new LayoutSubdiagramFeature(this));
+//		}
+//		return super.getLayoutFeature(context);
+//	}
 
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
