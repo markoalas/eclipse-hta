@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.edge;
 
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.graphiti.features.IFeatureProvider;

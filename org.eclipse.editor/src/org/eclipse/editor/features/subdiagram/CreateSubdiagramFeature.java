@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.subdiagram;
 
 import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;

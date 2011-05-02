@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.subdiagram;
 
 import org.eclipse.editor.editor.Diagram;
 import org.eclipse.emf.common.util.EList;

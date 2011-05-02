@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.subdiagram;
 
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Collections2.filter;

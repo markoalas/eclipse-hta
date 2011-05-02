@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.state;
 
 import org.eclipse.editor.editor.State;
 import org.eclipse.graphiti.features.IFeatureProvider;

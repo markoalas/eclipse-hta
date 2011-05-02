@@ -5,19 +5,19 @@ import static org.eclipse.editor.Log.withLogging;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
-import org.eclipse.editor.features.AddConnectorFeature;
-import org.eclipse.editor.features.AddStateFeature;
-import org.eclipse.editor.features.AddEdgeFeature;
-import org.eclipse.editor.features.AddSubdiagramFeature;
-import org.eclipse.editor.features.CreateConnectorFeature;
-import org.eclipse.editor.features.CreateEdgeFeature;
-import org.eclipse.editor.features.CreateStateFeature;
-import org.eclipse.editor.features.CreateSubdiagramFeature;
-import org.eclipse.editor.features.DrillDownFeature;
-import org.eclipse.editor.features.LayoutSubdiagramFeature;
 import org.eclipse.editor.features.RenameFeature;
 import org.eclipse.editor.features.ResizeFeature;
-import org.eclipse.editor.features.UpdateFeature;
+import org.eclipse.editor.features.connector.AddConnectorFeature;
+import org.eclipse.editor.features.connector.CreateConnectorFeature;
+import org.eclipse.editor.features.edge.AddEdgeFeature;
+import org.eclipse.editor.features.edge.CreateEdgeFeature;
+import org.eclipse.editor.features.state.AddStateFeature;
+import org.eclipse.editor.features.state.CreateStateFeature;
+import org.eclipse.editor.features.subdiagram.AddSubdiagramFeature;
+import org.eclipse.editor.features.subdiagram.CreateSubdiagramFeature;
+import org.eclipse.editor.features.subdiagram.DrillDownFeature;
+import org.eclipse.editor.features.subdiagram.LayoutSubdiagramFeature;
+import org.eclipse.editor.features.subdiagram.UpdateDiagramFeature;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -90,8 +90,8 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
-		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-			return withLogging(IUpdateFeature.class, new UpdateFeature(this));
+		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof org.eclipse.editor.editor.Diagram) {
+			return withLogging(IUpdateFeature.class, new UpdateDiagramFeature(this));
 		}
 		return super.getUpdateFeature(context);
 	}

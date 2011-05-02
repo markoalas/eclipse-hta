@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.subdiagram;
 
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Collections2.filter;
@@ -25,16 +25,16 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-public class UpdateFeature extends AbstractUpdateFeature {
+public class UpdateDiagramFeature extends AbstractUpdateFeature {
 
-	public UpdateFeature(IFeatureProvider fp) {
+	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
 		Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-		return bo instanceof EClass;
+		return bo instanceof org.eclipse.editor.editor.Diagram;
 	}
 
 	@Override
@@ -43,22 +43,21 @@ public class UpdateFeature extends AbstractUpdateFeature {
 
 		String pictogramName = getPictogramName(pictogramElement);
 		String businessName = getBusinessName(pictogramElement);
-		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-		if (bo instanceof EClass) {
-			EClass eClass = (EClass) bo;
-			if (eClass.getName().equals("Klass")) {
-				EList<EObject> eResourceContents = eClass.eResource().getContents();
-				Collection<Diagram> diagrams = getLinkedDiagrams(pictogramElement,
-						transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
-				if (diagrams.size() > 0) {
-					Diagram d = diagrams.iterator().next();
+		Object businessObject = getBusinessObjectForPictogramElement(pictogramElement);
+		if (businessObject instanceof org.eclipse.editor.editor.Diagram) {
+			org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram) businessObject;
+			EList<EObject> eResourceContents = diagram.eResource().getContents();
+			Collection<Diagram> diagrams = getLinkedDiagrams(pictogramElement,
+					transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
+			if (diagrams.size() > 0) {
+				Diagram d = diagrams.iterator().next();
 
-					for (PictogramElement e : d.getChildren()) {
-						Object bo1 = getBusinessObjectForPictogramElement(e);
-						if (bo1 instanceof Connector) {
-							GraphicsAlgorithm graphicsAlgorithm = e.getGraphicsAlgorithm();
-							System.out.println(graphicsAlgorithm.getX() + ":" + graphicsAlgorithm.getY());
-						}
+				for (PictogramElement e : d.getChildren()) {
+					Object child = getBusinessObjectForPictogramElement(e);
+					if (child instanceof Connector) {
+						GraphicsAlgorithm graphicsAlgorithm = e.getGraphicsAlgorithm();
+						// TODO maybe connector places could be stored in the model?
+						System.out.println(graphicsAlgorithm.getX() + ":" + graphicsAlgorithm.getY());
 					}
 				}
 			}
@@ -73,7 +72,7 @@ public class UpdateFeature extends AbstractUpdateFeature {
 		}
 	}
 
-	// selle asemel võiks teha getFeatureProvider().getDrillDownFeature() ...
+	// TODO this is common code with DrillDownFeature
 	protected Collection<Diagram> getLinkedDiagrams(PictogramElement pe, Collection<Diagram> allDiagrams) {
 		final Collection<Diagram> ret = new HashSet<Diagram>();
 
@@ -81,9 +80,7 @@ public class UpdateFeature extends AbstractUpdateFeature {
 
 		for (final Diagram d : allDiagrams) {
 			final Diagram currentDiagram = getDiagram();
-			if (!EcoreUtil.equals(currentDiagram, d)) { // always filter out the
-														// current
-				// diagram
+			if (!EcoreUtil.equals(currentDiagram, d)) {
 				final Object[] businessObjectsForDiagram = getAllBusinessObjectsForPictogramElement(d);
 				for (int i = 0; i < businessObjectsForDiagram.length; i++) {
 					final Object diagramBo = businessObjectsForDiagram[i];

@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.subdiagram;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -43,8 +43,8 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
 
-		int width = context.getWidth();
-		int height = context.getHeight();
+		int width = Math.max(100, context.getWidth());
+		int height = Math.max(100, context.getHeight());
 
 		IGaService gaService = Graphiti.getGaService();
 

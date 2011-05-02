@@ -1,4 +1,4 @@
-package org.eclipse.editor.features;
+package org.eclipse.editor.features.connector;
 
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.graphiti.features.IAddFeature;
