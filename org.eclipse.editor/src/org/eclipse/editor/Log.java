@@ -17,7 +17,7 @@ public class Log {
 	}
 
 	/**
-	 * @return Proxy for obj that logs all its method invocations 
+	 * @return Proxy object that logs all its method invocations 
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, U extends T> T withLogging(Class<T> interfaceClass, U obj) {
@@ -26,14 +26,14 @@ public class Log {
 
 	private static class LoggingInvocationHandler implements InvocationHandler {
 		final Object underlying;
-		final Joiner argumentJoiner = Joiner.on(",");
+		final Joiner joiner = Joiner.on(",");
 	
 		public LoggingInvocationHandler(Object underlying) {
 			this.underlying = underlying;
 		}
 	
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			String msg = underlying.getClass().getSimpleName() + "." + method.getName() + "(" + (args == null ? "" : argumentJoiner.join(args)) + ")";
+			String msg = underlying.getClass().getSimpleName() + "." + method.getName() + "(" + (args == null ? "" : joiner.join(args)) + ")";
 			
 			Object ret = method.invoke(underlying, args);
 			

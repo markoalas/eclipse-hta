@@ -22,8 +22,8 @@ import org.eclipse.graphiti.util.IColorConstant;
 public class AddSubdiagramFeature extends AbstractAddFeature {
 
 	private static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
-	private static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 102, 0);
-	private static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
+	public static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 102, 0);
+	public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
 
 	public AddSubdiagramFeature(IFeatureProvider fp) {
 		super(fp);
@@ -105,7 +105,7 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 	private void createAnchor(IPeCreateService peCreateService, ContainerShape containerShape, IGaService gaService) {
 		peCreateService.createChopboxAnchor(containerShape);
 		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-		boxAnchor.setRelativeWidth(1.0);
+		boxAnchor.setRelativeWidth(0.5);
 		boxAnchor.setRelativeHeight(0.5);
 
 		// assign a graphics algorithm for the box relative anchor

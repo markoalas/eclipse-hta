@@ -46,5 +46,9 @@ public class EditorUtil {
 		
 		return null;
 	}
+	
+	public static String nvl(String value) {
+		return coalesce(value, "");
+	}
 
 }
