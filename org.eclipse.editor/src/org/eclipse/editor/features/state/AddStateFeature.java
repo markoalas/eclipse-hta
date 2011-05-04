@@ -22,20 +22,16 @@ import org.eclipse.graphiti.util.IColorConstant;
 
 public class AddStateFeature extends AbstractAddShapeFeature {
 
-	private static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(
-			51, 51, 153);
-	private static final IColorConstant CLASS_FOREGROUND = new ColorConstant(
-			255, 102, 0);
-	private static final IColorConstant CLASS_BACKGROUND = new ColorConstant(
-			255, 204, 153);
+	private static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
+	private static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 102, 0);
+	private static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
 
 	public AddStateFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
 	public boolean canAdd(IAddContext context) {
-		return context.getNewObject() instanceof State
-				&& context.getTargetContainer() instanceof Diagram;
+		return context.getNewObject() instanceof State && context.getTargetContainer() instanceof Diagram;
 	}
 
 	public PictogramElement add(IAddContext context) {
@@ -44,13 +40,13 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
-		
+
 		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
 		link(containerShape, connector);
 
 		int width = 50;
 		int height = 40;
-		
+
 		Rectangle invisibleRect = gaService.createInvisibleRectangle(containerShape);
 		gaService.setLocationAndSize(invisibleRect, context.getX(), context.getY(), width, height);
 
@@ -61,6 +57,13 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 		Shape shape = peCreateService.createShape(containerShape, false);
 		createLabel(gaService, width, connector.getName(), shape);
 		
+		// TODO add circle indicating the initial state.
+//		Ellipse initialCircle = gaService.createEllipse(containerShape);
+//		int w = 2;
+//		gaService.setLocationAndSize(initialCircle, w, w, w, w);
+//		initialCircle.setForeground(manageColor(CLASS_FOREGROUND));
+//		initialCircle.setBackground(manageColor(CLASS_BACKGROUND));
+
 		createAnchor(peCreateService, gaService, containerShape);
 
 		layoutPictogramElement(containerShape);
@@ -82,14 +85,14 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 		boxAnchor.setRelativeWidth(0.5);
 		boxAnchor.setRelativeHeight(1);
 
-		Ellipse rectangle = gaService.createEllipse(boxAnchor);
-		rectangle.setFilled(true);
+		Ellipse ellipse = gaService.createEllipse(boxAnchor);
+		ellipse.setFilled(true);
 
 		int w = 20;
-		gaService.setLocationAndSize(rectangle, -w/2, -w, w, w);
-		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
-		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
-		
+		gaService.setLocationAndSize(ellipse, -w / 2, -w, w, w);
+		ellipse.setForeground(manageColor(CLASS_FOREGROUND));
+		ellipse.setBackground(manageColor(CLASS_BACKGROUND));
+
 		return boxAnchor;
 	}
 }

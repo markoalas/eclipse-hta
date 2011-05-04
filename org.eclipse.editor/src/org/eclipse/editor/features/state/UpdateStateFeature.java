@@ -1,6 +1,7 @@
 package org.eclipse.editor.features.state;
 
-import org.eclipse.editor.EditorUtil;
+import static org.eclipse.editor.EditorUtil.nvl;
+
 import org.eclipse.editor.editor.State;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
@@ -35,12 +36,11 @@ public class UpdateStateFeature extends AbstractUpdateFeature {
 		State state = (State)getBusinessObjectForPictogramElement(pictogramElement);
 		String pictogramName = getNameElement(pictogramElement).getValue();
 		
-		if (!EditorUtil.nvl(state.getName()).equals(EditorUtil.nvl(pictogramName))) {
+		if (!nvl(state.getName()).equals(nvl(pictogramName))) {
 			return Reason.createTrueReason("Name is out of date.");
 		}
 
 		return Reason.createFalseReason();
-
 	}
 	
 	private Text getNameElement(PictogramElement pictogramElement) {

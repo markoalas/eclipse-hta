@@ -1,0 +1,63 @@
+package org.eclipse.editor.features;
+
+import static org.eclipse.editor.EditorUtil.nvl;
+
+import org.eclipse.editor.AbstractPropertySection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
+
+public abstract class TextboxPropertySection<T> extends AbstractPropertySection<T> {
+	private Text text;
+
+	@Override
+	protected void createRow(TabbedPropertySheetWidgetFactory factory, Composite composite) {
+		text = factory.createText(composite, "");
+
+		FormData data;
+		data = new FormData();
+		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
+		data.right = new FormAttachment(100, 0);
+		data.top = new FormAttachment(0, VSPACE);
+		text.setLayoutData(data);
+
+		text.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				if (!nvl(getValue()).equals(text.getText())) {
+					doInTransaction(new Runnable() {
+						@Override
+						public void run() {
+							setValue(text.getText());
+						}
+					});
+				}
+			}
+		});
+
+		data = new FormData();
+		data.left = new FormAttachment(0, 0);
+		data.right = new FormAttachment(text, -HSPACE);
+		data.top = new FormAttachment(text, 0, SWT.CENTER);
+
+		CLabel nameLabel = factory.createCLabel(composite, getLabel());
+		nameLabel.setLayoutData(data);
+	}
+
+	@Override
+	public void refresh() {
+		text.setText(nvl(getValue()));
+	}
+
+	protected abstract String getValue();
+
+	protected abstract void setValue(String value);
+
+	protected abstract String getLabel();
+}
