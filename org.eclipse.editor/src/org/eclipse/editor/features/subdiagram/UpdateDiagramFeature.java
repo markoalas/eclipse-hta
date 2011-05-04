@@ -9,8 +9,10 @@ import static org.eclipse.editor.EditorUtil.cast;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.editor.Log;
@@ -57,7 +59,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 
 		String pictogramName = getPictogramName(pictogramElement);
 		String businessName = getBusinessName(pictogramElement);
-		List<PictogramElement> connectors = getAllConnectorElements(pictogramElement);
+		List<PictogramElement> connectors = getConnectorElementsForDiagram(pictogramElement);
 
 		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || (pictogramName != null && !pictogramName
 				.equals(businessName)));
@@ -72,7 +74,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		}
 	}
 
-	private List<PictogramElement> getAllConnectorElements(
+	private List<PictogramElement> getConnectorElementsForDiagram(
 			PictogramElement pictogramElement) {
 		List<PictogramElement> connectors = new ArrayList<PictogramElement>();
 
@@ -81,13 +83,13 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 			org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram) businessObject;
 			EList<EObject> eResourceContents = diagram.eResource()
 					.getContents();
-			
+
 			Collection<Diagram> diagrams = getLinkedDiagrams(
 					pictogramElement,
 					transform(
 							filter(eResourceContents, instanceOf(Diagram.class)),
 							cast(Diagram.class)));
-			
+
 			if (diagrams.size() > 0) {
 				Diagram d = diagrams.iterator().next();
 
@@ -102,14 +104,19 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		return connectors;
 	}
 
-	private List<Anchor> getAllAnchorsForSubdiagram(ContainerShape cs) {
-		List<PictogramElement> connectors = new ArrayList<PictogramElement>();
-
-		Object businessObject = getBusinessObjectForPictogramElement(cs);
-		if (businessObject instanceof org.eclipse.editor.editor.Diagram) {
-			org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram) businessObject;
+	private Map<Connector, BoxRelativeAnchor> getAnchorsForSubdiagram(ContainerShape cs) {
+		Map<Connector, BoxRelativeAnchor> anchors = new HashMap<Connector, BoxRelativeAnchor>();
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Collection<BoxRelativeAnchor> bras = (Collection)filter(cs.getAnchors(), instanceOf(BoxRelativeAnchor.class));
+		
+		for (BoxRelativeAnchor a : bras) {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Collection<Connector> connectors = (Collection) filter(a.getLink()
+					.getBusinessObjects(), instanceOf(Connector.class));
+			anchors.put(connectors.iterator().next(), a);
 		}
-		return null;
+
+		return anchors;
 	}
 
 	// TODO this is common code with DrillDownFeature
@@ -191,24 +198,32 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		try {
 			ContainerShape containerShape = (ContainerShape) diagramElement
 					.getGraphicsAlgorithm().eContainer();
-			containerShape.getAnchors().clear();
-			System.out.println("clearing");
-			List<PictogramElement> connectorElements = getAllConnectorElements(diagramElement);
+			Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram = getAnchorsForSubdiagram(containerShape);
+
+			List<PictogramElement> connectorElements = getConnectorElementsForDiagram(diagramElement);
 
 			for (PictogramElement connectorElement : connectorElements) {
 				Connector connector = (Connector) getBusinessObjectForPictogramElement(connectorElement);
 
 				GraphicsAlgorithm ga = connectorElement.getGraphicsAlgorithm();
 
-				double normalizedX = min(round(min(ga.getX(), 600.0) / 600), 0.9);
+				double normalizedX = min(round(min(ga.getX(), 600.0) / 600),
+						0.9);
 				double normalizedY = min(ga.getY(), 300.0) / 300;
 
 				IPeCreateService peCreateService = Graphiti
 						.getPeCreateService();
 				IGaService gaService = Graphiti.getGaService();
 
-				createAnchor(peCreateService, containerShape, gaService,
-						normalizedX, normalizedY, connector);
+				BoxRelativeAnchor anchor = findAnchorForConnector(anchorsForSubdiagram,
+						connector);
+				if (anchor != null) {
+					anchor.setRelativeWidth(normalizedX);
+					anchor.setRelativeHeight(normalizedY);
+				} else {
+					createAnchor(peCreateService, containerShape, gaService,
+							normalizedX, normalizedY, connector);
+				}
 			}
 		} catch (Exception e) {
 			// TODO better solution for finding containerShape
@@ -216,17 +231,29 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		}
 	}
 
+	private BoxRelativeAnchor findAnchorForConnector(
+			Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram, Connector connector) {
+		for (Map.Entry<Connector, BoxRelativeAnchor> e : anchorsForSubdiagram.entrySet()) {
+			if (EcoreUtil.equals(e.getKey(), connector)) {
+				return e.getValue();
+			}
+		}
+
+		return null;
+	}
+
 	private void createAnchor(IPeCreateService peCreateService,
 			ContainerShape containerShape, IGaService gaService, double x,
 			double y, Connector connector) {
-		
+
 		BoxRelativeAnchor boxAnchor = peCreateService
 				.createBoxRelativeAnchor(containerShape);
 		boxAnchor.setRelativeWidth(x);
 		boxAnchor.setRelativeHeight(y);
 
-		System.out.println("creating for " + connector.getName() + " " + x + ":" + y);
-		
+		System.out.println("creating for " + connector.getName() + " " + x
+				+ ":" + y);
+
 		Rectangle rectangle = gaService.createRectangle(boxAnchor);
 		rectangle.setFilled(true);
 
