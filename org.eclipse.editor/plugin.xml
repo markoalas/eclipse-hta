@@ -20,15 +20,13 @@
    
    <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
       <propertyContributor contributorId="org.eclipse.editor.diagramType.PropertyContributor">
-          <propertyCategory category="Graphiti">
-          </propertyCategory>
+          <propertyCategory category="Graphiti"/>
       </propertyContributor>
    </extension>
 
   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
       <propertyTabs contributorId="org.eclipse.editor.diagramType.PropertyContributor">
-          <propertyTab label="Main" category="Graphiti" id="graphiti.main.tab">
-          </propertyTab>
+          <propertyTab label="Main" category="Graphiti" id="graphiti.main.tab"/>
       </propertyTabs>
   </extension>
 
@@ -36,7 +34,8 @@
       <propertySections contributorId="org.eclipse.editor.diagramType.PropertyContributor">
           <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.StatePropertySection"
            filter="org.eclipse.editor.StatePropertyFilter"
-           id="graphiti.main.tab.state">
+           id="hta.NameSection"
+           enablesFor="1">
           </propertySection>
       </propertySections>
   </extension>

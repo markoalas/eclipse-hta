@@ -60,8 +60,7 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 
 		Shape shape = peCreateService.createShape(containerShape, false);
 		createLabel(gaService, width, connector.getName(), shape);
-		link(shape, connector);
-
+		
 		createAnchor(peCreateService, gaService, containerShape);
 
 		layoutPictogramElement(containerShape);

@@ -12,6 +12,7 @@ import org.eclipse.editor.features.edge.AddEdgeFeature;
 import org.eclipse.editor.features.edge.CreateEdgeFeature;
 import org.eclipse.editor.features.state.AddStateFeature;
 import org.eclipse.editor.features.state.CreateStateFeature;
+import org.eclipse.editor.features.state.UpdateStateFeature;
 import org.eclipse.editor.features.subdiagram.AddSubdiagramFeature;
 import org.eclipse.editor.features.subdiagram.CreateSubdiagramFeature;
 import org.eclipse.editor.features.subdiagram.DrillDownFeature;
@@ -83,8 +84,11 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
-		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof org.eclipse.editor.editor.Diagram) {
+		Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+		if (bo instanceof org.eclipse.editor.editor.Diagram) {
 			return withLogging(IUpdateFeature.class, new UpdateDiagramFeature(this));
+		} else if (bo instanceof State) {
+			return withLogging(IUpdateFeature.class, new UpdateStateFeature(this));
 		}
 		return super.getUpdateFeature(context);
 	}

@@ -2,7 +2,12 @@ package org.eclipse.editor;
 
 import static org.eclipse.editor.EditorUtil.coalesce;
 
+import java.util.Collection;
+
 import org.eclipse.editor.editor.State;
+import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
@@ -35,10 +40,10 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 		Composite composite = factory.createFlatFormComposite(parent);
 
 		createNameRow(factory, composite);
-		createInvariantRow(factory, composite);
-		createInitialRow(factory, composite);
-		createUrgentRow(factory, composite);
-		createCommittedRow(factory, composite);
+		// createInvariantRow(factory, composite);
+		// createInitialRow(factory, composite);
+		// createUrgentRow(factory, composite);
+		// createCommittedRow(factory, composite);
 	}
 
 	private void createNameRow(TabbedPropertySheetWidgetFactory factory, Composite composite) {
@@ -50,14 +55,17 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);
 		nameText.setLayoutData(data);
-		
+
 		nameText.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
-				// TODO this needs to be done in a write transaction
 				if (!getStateObject().getName().equals(nameText.getText())) {
-					//new org.eclipse.emf.edit.command.ChangeCommand()
-					getStateObject().setName(nameText.getText());
+					TransactionalEditingDomain editingDomain = getDiagramEditor().getEditingDomain();
+					editingDomain.getCommandStack().execute(new RecordingCommand(editingDomain) {
+						protected void doExecute() {
+							getStateObject().setName(nameText.getText());
+						}
+					});
 				}
 			}
 		});
@@ -151,14 +159,13 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 		initialCheckbox.setLayoutData(data);
 	}
 
-
 	@Override
 	public void refresh() {
 		State state = getStateObject();
 
 		nameText.setText(coalesce(state.getName(), ""));
-		invariantText.setText(coalesce(state.getInvariant(), ""));
-		initialCheckbox.setData(state.isInitial());
+		// invariantText.setText(coalesce(state.getInvariant(), ""));
+		// initialCheckbox.setData(state.isInitial());
 	}
 
 	private State getStateObject() {
@@ -170,7 +177,7 @@ public class StatePropertySection extends GFPropertySection implements ITabbedPr
 			if (bo != null)
 				state = (State) bo;
 		}
-		
+
 		return state;
 	}
 }
