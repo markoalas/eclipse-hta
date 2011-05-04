@@ -4,11 +4,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
-import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -95,29 +93,8 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 			link(shape, addedSubdiagram);
 		}
 
-		createAnchor(peCreateService, containerShape, gaService);
-
 		layoutPictogramElement(containerShape);
 
 		return containerShape;
 	}
-
-	private void createAnchor(IPeCreateService peCreateService, ContainerShape containerShape, IGaService gaService) {
-		peCreateService.createChopboxAnchor(containerShape);
-		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-		boxAnchor.setRelativeWidth(0.5);
-		boxAnchor.setRelativeHeight(0.5);
-
-		// assign a graphics algorithm for the box relative anchor
-		Rectangle rectangle = gaService.createRectangle(boxAnchor);
-		rectangle.setFilled(true);
-
-		// anchor is located on the right border of the visible rectangle
-		// and touches the border of the invisible rectangle
-		int w = 6;
-		gaService.setLocationAndSize(rectangle, -2 * w, -w, 2 * w, 2 * w);
-		rectangle.setForeground(manageColor(CLASS_FOREGROUND));
-		rectangle.setBackground(manageColor(CLASS_BACKGROUND));
-	}
-
 }

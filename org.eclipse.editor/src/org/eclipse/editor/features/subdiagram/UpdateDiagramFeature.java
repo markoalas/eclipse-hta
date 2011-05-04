@@ -1,24 +1,22 @@
 package org.eclipse.editor.features.subdiagram;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.find;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static org.eclipse.editor.EditorUtil.cast;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -29,7 +27,6 @@ import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -39,17 +36,21 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-public class UpdateDiagramFeature extends AbstractUpdateFeature {
-	private static final Logger log = Log.getLogger();
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Ints;
 
+public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		Object bo = getBusinessObjectForPictogramElement(context
-				.getPictogramElement());
+		Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
 		return bo instanceof org.eclipse.editor.editor.Diagram;
 	}
 
@@ -57,131 +58,151 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	public IReason updateNeeded(IUpdateContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 
+		IReason nameReason = getNameUpdateReason(pictogramElement);
+		if (nameReason.toBoolean()) {
+			return nameReason;
+		}
+
+		IReason connectorsReason = getConnectorsUpdateReason(pictogramElement);
+		if (connectorsReason.toBoolean()) {
+			return connectorsReason;
+		}
+
+		return Reason.createFalseReason();
+	}
+
+	private IReason getNameUpdateReason(PictogramElement pictogramElement) {
 		String pictogramName = getPictogramName(pictogramElement);
 		String businessName = getBusinessName(pictogramElement);
-		List<PictogramElement> connectors = getConnectorElementsForDiagram(pictogramElement);
 
-		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || (pictogramName != null && !pictogramName
-				.equals(businessName)));
+		boolean updateNameNeeded = (pictogramName == null && businessName != null) || (pictogramName != null && !pictogramName.equals(businessName));
 		if (updateNameNeeded) {
 			return Reason.createTrueReason("Name is out of date");
-		} else if (connectors.size() > 0) {
-			// TODO figure out if the connectors have changed and only then
-			// return true
-			return Reason.createTrueReason("Connectors need updating");
 		} else {
 			return Reason.createFalseReason();
 		}
 	}
 
-	private List<PictogramElement> getConnectorElementsForDiagram(
-			PictogramElement pictogramElement) {
-		List<PictogramElement> connectors = new ArrayList<PictogramElement>();
+	/**
+	 * TODO Return true only if the connectors have changed after last update.
+	 */
+	private IReason getConnectorsUpdateReason(PictogramElement pictogramElement) {
+		Iterable<PictogramElement> connectors = getConnectorElementsForDiagram(pictogramElement);
+
+		if (connectors.iterator().hasNext()) {
+			return Reason.createTrueReason("Connectors are out of date");
+		} else {
+			return Reason.createFalseReason();
+		}
+	}
+
+	private String getPictogramName(PictogramElement pictogramElement) {
+		try {
+			ContainerShape cs = (ContainerShape) pictogramElement;
+			Text text = (Text) Iterables.find(cs.getChildren(), instanceOf(Text.class));
+			return text.getValue();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private Iterable<PictogramElement> getConnectorElementsForDiagram(PictogramElement pictogramElement) {
+		return filter(getAllElementsForDiagram(pictogramElement), isLinkedToConnector());
+	}
+
+	private Predicate<PictogramElement> isLinkedToConnector() {
+		return new Predicate<PictogramElement>() {
+			@Override
+			public boolean apply(PictogramElement e) {
+				return getBusinessObjectForPictogramElement(e) instanceof Connector;
+			}
+		};
+	}
+	
+	private List<PictogramElement> getAllElementsForDiagram(PictogramElement pictogramElement) {
 
 		Object businessObject = getBusinessObjectForPictogramElement(pictogramElement);
-		if (businessObject instanceof org.eclipse.editor.editor.Diagram) {
-			org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram) businessObject;
-			EList<EObject> eResourceContents = diagram.eResource()
-					.getContents();
+		checkArgument(businessObject instanceof org.eclipse.editor.editor.Diagram, "pictogramElement must be liked a Diagram business object.");
 
-			Collection<Diagram> diagrams = getLinkedDiagrams(
-					pictogramElement,
-					transform(
-							filter(eResourceContents, instanceOf(Diagram.class)),
-							cast(Diagram.class)));
+		org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram) businessObject;
+		EList<EObject> eResourceContents = diagram.eResource().getContents();
 
-			if (diagrams.size() > 0) {
-				Diagram d = diagrams.iterator().next();
+		Diagram d = getLinkedDiagram(pictogramElement, transform(filter(eResourceContents, instanceOf(Diagram.class)), cast(Diagram.class)));
 
-				for (PictogramElement e : d.getChildren()) {
-					Object child = getBusinessObjectForPictogramElement(e);
-					if (child instanceof Connector) {
-						connectors.add(e);
-					}
-				}
-			}
+		List<PictogramElement> connectors = Lists.newArrayList();
+		for (PictogramElement e : d.getChildren()) {
+			connectors.add(e);
 		}
+
 		return connectors;
 	}
 
+
 	private Map<Connector, BoxRelativeAnchor> getAnchorsForSubdiagram(ContainerShape cs) {
-		Map<Connector, BoxRelativeAnchor> anchors = new HashMap<Connector, BoxRelativeAnchor>();
+		Map<Connector, BoxRelativeAnchor> anchors = Maps.newHashMap();
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		Collection<BoxRelativeAnchor> bras = (Collection)filter(cs.getAnchors(), instanceOf(BoxRelativeAnchor.class));
-		
-		for (BoxRelativeAnchor a : bras) {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			Collection<Connector> connectors = (Collection) filter(a.getLink()
-					.getBusinessObjects(), instanceOf(Connector.class));
-			anchors.put(connectors.iterator().next(), a);
+		Collection<BoxRelativeAnchor> relativeAnchors = (Collection) filter(cs.getAnchors(), instanceOf(BoxRelativeAnchor.class));
+
+		for (BoxRelativeAnchor a : relativeAnchors) {
+			Connector connector = (Connector) Iterables.find(a.getLink().getBusinessObjects(), instanceOf(Connector.class));
+			anchors.put(connector, a);
 		}
 
 		return anchors;
 	}
 
-	// TODO this is common code with DrillDownFeature
-	protected Collection<Diagram> getLinkedDiagrams(PictogramElement pe,
-			Collection<Diagram> allDiagrams) {
-		final Collection<Diagram> ret = new HashSet<Diagram>();
+	private Diagram getLinkedDiagram(PictogramElement pe, Collection<Diagram> allDiagrams) {
+		Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
+		Diagram currentDiagram = getDiagram();
 
-		final Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
+		return find(allDiagrams, and(notEqual(currentDiagram), containsAnyOf(businessObjectsForPictogramElement)));
+	}
 
-		for (final Diagram d : allDiagrams) {
-			final Diagram currentDiagram = getDiagram();
-			if (!EcoreUtil.equals(currentDiagram, d)) {
-				final Object[] businessObjectsForDiagram = getAllBusinessObjectsForPictogramElement(d);
-				for (int i = 0; i < businessObjectsForDiagram.length; i++) {
-					final Object diagramBo = businessObjectsForDiagram[i];
-					for (int j = 0; j < businessObjectsForPictogramElement.length; j++) {
-						final Object currentBo = businessObjectsForPictogramElement[j];
-						if (EcoreUtil.equals((EObject) currentBo,
-								(EObject) diagramBo)) {
-							ret.add(d);
+	private Predicate<Diagram> containsAnyOf(final Object[] businessObjects) {
+		return new Predicate<Diagram>() {
+			@Override
+			public boolean apply(Diagram d) {
+				Object[] businessObjectsForDiagram = getAllBusinessObjectsForPictogramElement(d);
+
+				for (Object diagramBo : businessObjectsForDiagram) {
+					for (Object currentBo : businessObjects) {
+						if (EcoreUtil.equals((EObject) currentBo, (EObject) diagramBo)) {
+							return true;
 						}
 					}
 				}
-			}
-		}
 
-		return ret;
+				return false;
+			}
+		};
+	}
+
+	private Predicate<Diagram> notEqual(final Diagram currentDiagram) {
+		return new Predicate<Diagram>() {
+			@Override
+			public boolean apply(Diagram d) {
+				return !EcoreUtil.equals(currentDiagram, d);
+			}
+		};
 	}
 
 	@Override
 	public boolean update(IUpdateContext context) {
-		PictogramElement pictogramElement = context.getPictogramElement();
-		String businessName = getBusinessName(pictogramElement);
-
-		setPictogramName(pictogramElement, businessName);
+		ContainerShape pictogramElement = (ContainerShape) context.getPictogramElement();
+		updateName(pictogramElement);
 		updateConnectors(pictogramElement);
 
 		return true;
 	}
 
-	private void setPictogramName(PictogramElement pictogramElement,
-			String newName) {
-		if (pictogramElement instanceof ContainerShape) {
-			ContainerShape cs = (ContainerShape) pictogramElement;
-			for (Shape shape : cs.getChildren()) {
-				GraphicsAlgorithm graphicsAlgorithm = shape
-						.getGraphicsAlgorithm();
-				if (graphicsAlgorithm instanceof Text) {
-					((Text) graphicsAlgorithm).setValue(newName);
-				}
+	private void updateName(ContainerShape pictogramElement) {
+		ContainerShape cs = (ContainerShape) pictogramElement;
+		for (Shape shape : cs.getChildren()) {
+			GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+			if (graphicsAlgorithm instanceof Text) {
+				((Text) graphicsAlgorithm).setValue(getBusinessName(pictogramElement));
 			}
 		}
-	}
-
-	private String getPictogramName(PictogramElement pictogramElement) {
-		if (pictogramElement instanceof ContainerShape) {
-			ContainerShape cs = (ContainerShape) pictogramElement;
-			for (Shape shape : cs.getChildren()) {
-				if (shape.getGraphicsAlgorithm() instanceof Text) {
-					Text text = (Text) shape.getGraphicsAlgorithm();
-					return text.getValue();
-				}
-			}
-		}
-		return null;
 	}
 
 	private String getBusinessName(PictogramElement pictogramElement) {
@@ -194,45 +215,49 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		return businessName;
 	}
 
-	private void updateConnectors(PictogramElement diagramElement) {
-		try {
-			ContainerShape containerShape = (ContainerShape) diagramElement
-					.getGraphicsAlgorithm().eContainer();
-			Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram = getAnchorsForSubdiagram(containerShape);
+	private void updateConnectors(ContainerShape containerShape) {
+		Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram = getAnchorsForSubdiagram(containerShape);
 
-			List<PictogramElement> connectorElements = getConnectorElementsForDiagram(diagramElement);
+		Iterable<PictogramElement> connectorElements = getConnectorElementsForDiagram(containerShape);
+		double maxX = xOrdering().max(connectorElements).getGraphicsAlgorithm().getX();
+		double maxY = max(yOrdering().max(getAllElementsForDiagram(containerShape)).getGraphicsAlgorithm().getY(), 300);
+		
+		for (PictogramElement connectorElement : connectorElements) {
+			Connector connector = (Connector) getBusinessObjectForPictogramElement(connectorElement);
 
-			for (PictogramElement connectorElement : connectorElements) {
-				Connector connector = (Connector) getBusinessObjectForPictogramElement(connectorElement);
+			GraphicsAlgorithm ga = connectorElement.getGraphicsAlgorithm();
+			double normalizedX = min(round(min(ga.getX(), maxX) / maxX), 0.9);
+			double normalizedY = min(max(min(ga.getY(), maxY) / maxY, 0.1), 0.9);
 
-				GraphicsAlgorithm ga = connectorElement.getGraphicsAlgorithm();
-
-				double normalizedX = min(round(min(ga.getX(), 600.0) / 600),
-						0.9);
-				double normalizedY = min(ga.getY(), 300.0) / 300;
-
-				IPeCreateService peCreateService = Graphiti
-						.getPeCreateService();
-				IGaService gaService = Graphiti.getGaService();
-
-				BoxRelativeAnchor anchor = findAnchorForConnector(anchorsForSubdiagram,
-						connector);
-				if (anchor != null) {
-					anchor.setRelativeWidth(normalizedX);
-					anchor.setRelativeHeight(normalizedY);
-				} else {
-					createAnchor(peCreateService, containerShape, gaService,
-							normalizedX, normalizedY, connector);
-				}
+			BoxRelativeAnchor anchor = findAnchorForConnector(anchorsForSubdiagram, connector);
+			if (anchor == null) {
+				anchor = createAnchor(containerShape, connector);
 			}
-		} catch (Exception e) {
-			// TODO better solution for finding containerShape
-			log.error(e.getMessage(), e);
+			
+			anchor.setRelativeWidth(normalizedX);
+			anchor.setRelativeHeight(normalizedY);
 		}
 	}
 
-	private BoxRelativeAnchor findAnchorForConnector(
-			Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram, Connector connector) {
+	private Ordering<PictogramElement> yOrdering() {
+		return new Ordering<PictogramElement>() {
+			@Override
+			public int compare(PictogramElement arg0, PictogramElement arg1) {
+				return Ints.compare(arg0.getGraphicsAlgorithm().getY(), arg1.getGraphicsAlgorithm().getY());
+			}
+		};
+	}
+
+	private Ordering<PictogramElement> xOrdering() {
+		return new Ordering<PictogramElement>() {
+			@Override
+			public int compare(PictogramElement arg0, PictogramElement arg1) {
+				return Ints.compare(arg0.getGraphicsAlgorithm().getX(), arg1.getGraphicsAlgorithm().getX());
+			}
+		};
+	}
+
+	private BoxRelativeAnchor findAnchorForConnector(Map<Connector, BoxRelativeAnchor> anchorsForSubdiagram, Connector connector) {
 		for (Map.Entry<Connector, BoxRelativeAnchor> e : anchorsForSubdiagram.entrySet()) {
 			if (EcoreUtil.equals(e.getKey(), connector)) {
 				return e.getValue();
@@ -242,17 +267,10 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		return null;
 	}
 
-	private void createAnchor(IPeCreateService peCreateService,
-			ContainerShape containerShape, IGaService gaService, double x,
-			double y, Connector connector) {
-
-		BoxRelativeAnchor boxAnchor = peCreateService
-				.createBoxRelativeAnchor(containerShape);
-		boxAnchor.setRelativeWidth(x);
-		boxAnchor.setRelativeHeight(y);
-
-		System.out.println("creating for " + connector.getName() + " " + x
-				+ ":" + y);
+	private BoxRelativeAnchor createAnchor(ContainerShape containerShape, Connector connector) {
+		IPeCreateService peCreateService = Graphiti.getPeCreateService();
+		IGaService gaService = Graphiti.getGaService();
+		BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
 
 		Rectangle rectangle = gaService.createRectangle(boxAnchor);
 		rectangle.setFilled(true);
@@ -260,9 +278,9 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		int w = 12;
 		gaService.setSize(rectangle, w, w);
 		link(boxAnchor, connector);
-		rectangle
-				.setForeground(manageColor(AddSubdiagramFeature.CLASS_FOREGROUND));
-		rectangle
-				.setBackground(manageColor(AddSubdiagramFeature.CLASS_BACKGROUND));
+		rectangle.setForeground(manageColor(AddSubdiagramFeature.CLASS_FOREGROUND));
+		rectangle.setBackground(manageColor(AddSubdiagramFeature.CLASS_BACKGROUND));
+
+		return boxAnchor;
 	}
 }
