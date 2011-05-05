@@ -57,15 +57,8 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 		Shape shape = peCreateService.createShape(containerShape, false);
 		createLabel(gaService, width, connector.getName(), shape);
 		
-		// TODO add circle indicating the initial state.
-//		Ellipse initialCircle = gaService.createEllipse(containerShape);
-//		int w = 2;
-//		gaService.setLocationAndSize(initialCircle, w, w, w, w);
-//		initialCircle.setForeground(manageColor(CLASS_FOREGROUND));
-//		initialCircle.setBackground(manageColor(CLASS_BACKGROUND));
-
 		createAnchor(peCreateService, gaService, containerShape);
-
+		
 		layoutPictogramElement(containerShape);
 
 		return containerShape;
@@ -87,12 +80,17 @@ public class AddStateFeature extends AbstractAddShapeFeature {
 
 		Ellipse ellipse = gaService.createEllipse(boxAnchor);
 		ellipse.setFilled(true);
-
+		
 		int w = 20;
 		gaService.setLocationAndSize(ellipse, -w / 2, -w, w, w);
 		ellipse.setForeground(manageColor(CLASS_FOREGROUND));
 		ellipse.setBackground(manageColor(CLASS_BACKGROUND));
 
+		// TODO indicate initial state somehow
+//		Ellipse initialCircle = gaService.createEllipse(boxAnchor);
+//		w = 15;
+//		gaService.setLocationAndSize(initialCircle, w, w, w, w);
+		
 		return boxAnchor;
 	}
 }

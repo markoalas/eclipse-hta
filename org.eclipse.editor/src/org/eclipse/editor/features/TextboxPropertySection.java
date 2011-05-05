@@ -3,7 +3,6 @@ package org.eclipse.editor.features;
 import static org.eclipse.editor.EditorUtil.nvl;
 
 import org.eclipse.editor.AbstractPropertySection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -24,7 +23,6 @@ public abstract class TextboxPropertySection<T> extends AbstractPropertySection<
 		data = new FormData();
 		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
 		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, VSPACE);
 		text.setLayoutData(data);
 
 		text.addModifyListener(new ModifyListener() {
@@ -41,13 +39,8 @@ public abstract class TextboxPropertySection<T> extends AbstractPropertySection<
 			}
 		});
 
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(text, -HSPACE);
-		data.top = new FormAttachment(text, 0, SWT.CENTER);
-
 		CLabel nameLabel = factory.createCLabel(composite, getLabel());
-		nameLabel.setLayoutData(data);
+		nameLabel.setLayoutData(new FormData());
 	}
 
 	@Override

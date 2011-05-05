@@ -3,7 +3,7 @@ package org.eclipse.editor.features.state;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.features.TextboxPropertySection;
 
-public class StateInvariantPropertySection extends TextboxPropertySection<State> {
+public class InvariantPropertySection extends TextboxPropertySection<State> {
 
 	@Override
 	protected String getValue() {

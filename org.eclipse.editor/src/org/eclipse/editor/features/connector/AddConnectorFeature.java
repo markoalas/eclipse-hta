@@ -56,7 +56,6 @@ public class AddConnectorFeature extends AbstractAddFeature implements IAddFeatu
 
 		Shape shape = peCreateService.createShape(containerShape, false);
 		createLabel(gaService, width, connector.getName(), shape);
-		link(shape, connector);
 
 		createAnchor(peCreateService, gaService, containerShape);
 

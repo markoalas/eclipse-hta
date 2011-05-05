@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -44,6 +46,8 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Ints;
 
 public class UpdateDiagramFeature extends AbstractUpdateFeature {
+	private static final Logger log = Log.getLogger();
+	
 	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 	}
@@ -118,7 +122,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 			}
 		};
 	}
-	
+
 	private List<PictogramElement> getAllElementsForDiagram(PictogramElement pictogramElement) {
 
 		Object businessObject = getBusinessObjectForPictogramElement(pictogramElement);
@@ -136,7 +140,6 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 
 		return connectors;
 	}
-
 
 	private Map<Connector, BoxRelativeAnchor> getAnchorsForSubdiagram(ContainerShape cs) {
 		Map<Connector, BoxRelativeAnchor> anchors = Maps.newHashMap();
@@ -188,11 +191,15 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 
 	@Override
 	public boolean update(IUpdateContext context) {
-		ContainerShape pictogramElement = (ContainerShape) context.getPictogramElement();
-		updateName(pictogramElement);
-		updateConnectors(pictogramElement);
-
-		return true;
+		try {
+			ContainerShape pictogramElement = (ContainerShape) context.getPictogramElement();
+			updateName(pictogramElement);
+			updateConnectors(pictogramElement);
+			return true;
+		} catch (Exception e) {
+			log.error("Unable to update diagram: " + e.getMessage());
+			return false;
+		}
 	}
 
 	private void updateName(ContainerShape pictogramElement) {
@@ -221,7 +228,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		Iterable<PictogramElement> connectorElements = getConnectorElementsForDiagram(containerShape);
 		double maxX = xOrdering().max(connectorElements).getGraphicsAlgorithm().getX();
 		double maxY = max(yOrdering().max(getAllElementsForDiagram(containerShape)).getGraphicsAlgorithm().getY(), 300);
-		
+
 		for (PictogramElement connectorElement : connectorElements) {
 			Connector connector = (Connector) getBusinessObjectForPictogramElement(connectorElement);
 
@@ -233,7 +240,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 			if (anchor == null) {
 				anchor = createAnchor(containerShape, connector);
 			}
-			
+
 			anchor.setRelativeWidth(normalizedX);
 			anchor.setRelativeHeight(normalizedY);
 		}

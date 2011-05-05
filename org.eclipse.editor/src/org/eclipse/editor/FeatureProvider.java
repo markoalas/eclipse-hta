@@ -5,9 +5,9 @@ import static org.eclipse.editor.Log.withLogging;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
-import org.eclipse.editor.features.RenameFeature;
 import org.eclipse.editor.features.connector.AddConnectorFeature;
 import org.eclipse.editor.features.connector.CreateConnectorFeature;
+import org.eclipse.editor.features.connector.UpdateConnectorFeature;
 import org.eclipse.editor.features.edge.AddEdgeFeature;
 import org.eclipse.editor.features.edge.CreateEdgeFeature;
 import org.eclipse.editor.features.state.AddStateFeature;
@@ -66,22 +66,6 @@ public class FeatureProvider extends DefaultFeatureProvider {
 		return getCreateConnectionFeatures();
 	}
 
-//	@Override
-//	public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
-//		if (getBusinessObjectForPictogramElement(context.getShape()) instanceof EClass) {
-//			return withLogging(IResizeShapeFeature.class, new ResizeFeature(this));
-//		}
-//		return super.getResizeShapeFeature(context);
-//	}
-//
-//	@Override
-//	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
-//		if (getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof EClass) {
-//			return withLogging(ILayoutFeature.class, new LayoutSubdiagramFeature(this));
-//		}
-//		return super.getLayoutFeature(context);
-//	}
-
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 		Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
@@ -89,12 +73,14 @@ public class FeatureProvider extends DefaultFeatureProvider {
 			return withLogging(IUpdateFeature.class, new UpdateDiagramFeature(this));
 		} else if (bo instanceof State) {
 			return withLogging(IUpdateFeature.class, new UpdateStateFeature(this));
+		} else if (bo instanceof Connector) {
+			return withLogging(IUpdateFeature.class, new UpdateConnectorFeature(this));
 		}
 		return super.getUpdateFeature(context);
 	}
 
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { withLogging(ICustomFeature.class, new RenameFeature(this)), withLogging(ICustomFeature.class, new DrillDownFeature(this)) };
+		return new ICustomFeature[] { withLogging(ICustomFeature.class, new DrillDownFeature(this)) };
 	}
 }

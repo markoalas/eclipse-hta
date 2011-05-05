@@ -32,36 +32,70 @@
 
   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections contributorId="org.eclipse.editor.diagramType.PropertyContributor">
-          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.StateNamePropertySection"
-           filter="org.eclipse.editor.StatePropertyFilter"
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.NamePropertySection"
+           filter="org.eclipse.editor.features.state.PropertySectionFilter"
            id="hta.NameSection"
            enablesFor="1">
-          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.StateInvariantPropertySection"
-           filter="org.eclipse.editor.StatePropertyFilter"
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.InvariantPropertySection"
+           filter="org.eclipse.editor.features.state.PropertySectionFilter"
            id="hta.InvariantSection"
            enablesFor="1"
            afterSection="hta.NameSection">
           </propertySection>
           </propertySection>
-          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.StateInitialPropertySection"
-           filter="org.eclipse.editor.StatePropertyFilter"
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.InitialPropertySection"
+           filter="org.eclipse.editor.features.state.PropertySectionFilter"
            id="hta.InitialSection"
            enablesFor="1"
            afterSection="hta.InvariantSection">
           </propertySection>
-          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.StateUrgentPropertySection"
-           filter="org.eclipse.editor.StatePropertyFilter"
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.UrgentPropertySection"
+           filter="org.eclipse.editor.features.state.PropertySectionFilter"
            id="hta.UrgentSection"
            enablesFor="1"
            afterSection="hta.InitialSection">
           </propertySection>
-          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.StateCommitedPropertySection"
-           filter="org.eclipse.editor.StatePropertyFilter"
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.state.CommitedPropertySection"
+           filter="org.eclipse.editor.features.state.PropertySectionFilter"
            id="hta.CommitedSection"
            enablesFor="1"
            afterSection="hta.UrgentSection">
           </propertySection>
           
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.edge.SelectPropertySection"
+           filter="org.eclipse.editor.features.edge.PropertySectionFilter"
+           id="hta.EdgeSelectSection"
+           enablesFor="1"/>
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.edge.GuardPropertySection"
+           filter="org.eclipse.editor.features.edge.PropertySectionFilter"
+           id="hta.EdgeGuardSection"
+           enablesFor="1"
+           afterSection="hta.EdgeSelectSection"/>
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.edge.SyncPropertySection"
+           filter="org.eclipse.editor.features.edge.PropertySectionFilter"
+           id="hta.EdgeSynctSection"
+           enablesFor="1"
+           afterSection="hta.EdgeGuardSection"/>
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.edge.UpdatePropertySection"
+           filter="org.eclipse.editor.features.edge.PropertySectionFilter"
+           id="hta.EdgeUpdateSection"
+           enablesFor="1"
+           afterSection="hta.EdgeSynctSection"/>
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.edge.CommentsPropertySection"
+           filter="org.eclipse.editor.features.edge.PropertySectionFilter"
+           id="hta.EdgeCommentsSection"
+           enablesFor="1"
+           afterSection="hta.EdgeUpdateSection"/>
+          
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.connector.NamePropertySection"
+           filter="org.eclipse.editor.features.connector.PropertySectionFilter"
+           id="hta.ConnectorNameSection"
+           enablesFor="1"/>
+           
+          <propertySection tab="graphiti.main.tab" class="org.eclipse.editor.features.subdiagram.NamePropertySection"
+           filter="org.eclipse.editor.features.subdiagram.PropertySectionFilter"
+           id="hta.DiagramNameSection"
+           enablesFor="1"/>
       </propertySections>
   </extension>
 </plugin>

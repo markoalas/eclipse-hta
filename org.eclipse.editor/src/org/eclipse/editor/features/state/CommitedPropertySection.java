@@ -3,7 +3,7 @@ package org.eclipse.editor.features.state;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.features.CheckboxPropertySection;
 
-public class StateCommitedPropertySection extends CheckboxPropertySection<State>{
+public class CommitedPropertySection extends CheckboxPropertySection<State>{
 	@Override
 	protected boolean getValue() {
 		return getBusinessObject().isCommitted();

@@ -54,14 +54,10 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 			roundedRectangle.setLineWidth(2);
 			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
 
-			// if added Class has no resource we add it to the resource
-			// of the diagram
-			// in a real scenario the business model would have its own resource
 			if (addedSubdiagram.eResource() == null) {
 				getDiagram().eResource().getContents().add(addedSubdiagram);
 			}
 
-			// create link and wire it
 			link(containerShape, addedSubdiagram);
 		}
 
@@ -90,7 +86,7 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 			gaService.setLocationAndSize(text, 10, 0, width, 20);
 
 			// create link and wire it
-			link(shape, addedSubdiagram);
+			//link(shape, addedSubdiagram);
 		}
 
 		layoutPictogramElement(containerShape);
