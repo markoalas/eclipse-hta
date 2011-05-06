@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,6 +33,7 @@ import org.eclipse.emf.ecore.EObject;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 
 public class XmlSerializer {
 	private static Logger log = Log.getLogger();
@@ -76,12 +78,21 @@ public class XmlSerializer {
 		hta.getGlobalinit().add(createGlobalinit("template", entry));
 		return hta;
 	}
+	
+	private Map<String, Location> visitedLocations = Maps.newHashMap();
 
 	private Object generateFor(Template template, EObject root) {
 		if (root instanceof State) {
 			State state = (State) root;
+			String mapKey = template.getName().getvalue() + "." + state.getName();
+			if (visitedLocations.containsKey(mapKey)) {
+				return visitedLocations.get(mapKey);
+			}
+			
 			Location location = createLocation(template, state.getName());
 			template.getLocation().add(location);
+			visitedLocations.put(mapKey, location);
+			
 			location.getLabel().add(createLabel("invariant", state.getInvariant()));
 			location.getLabel().add(createLabel("initial", String.valueOf(state.isInitial())));
 			location.getLabel().add(createLabel("committed", String.valueOf(state.isCommitted())));

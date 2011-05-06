@@ -1,6 +1,7 @@
 package org.eclipse.editor.huppaal;
 
 import static org.eclipse.editor.EditorUtil.nvl;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -17,7 +18,6 @@ import org.eclipse.editor.huppaal.model.Label;
 import org.eclipse.editor.huppaal.model.Location;
 import org.eclipse.editor.huppaal.model.Template;
 import org.eclipse.editor.huppaal.model.Transition;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -137,11 +137,37 @@ public class XmlSerializerTest {
 		
 		List<Transition> transitions = template.getTransition();
 		assertEquals(2, transitions.size());
-		assertEquals(locations.get(0), transitions.get(0).getSource().getRef());
-		assertEquals(locations.get(1), transitions.get(0).getTarget().getRef());
+		assertTrue(hasTransition(transitions, locations.get(0), locations.get(1)));
+		assertTrue(hasTransition(transitions, locations.get(0), locations.get(2)));
+	}
+	
+	@Test
+	public void cyclic() throws Exception {
+		State stateA = createState("A");
+		stateA.setInitial(true);
+		State stateB = createState("B");
+		createEdge(stateA, stateB);
+		createEdge(stateB, stateA);
 		
-		assertEquals(locations.get(0), transitions.get(1).getSource().getRef());
-		assertEquals(locations.get(2), transitions.get(1).getTarget().getRef());
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		Template template = hta.getTemplate().get(0);
+		
+		List<Location> locations = template.getLocation();
+		assertEquals(2, locations.size());
+		
+		List<Transition> transitions = template.getTransition();
+		assertEquals(2, transitions.size());
+		assertTrue(hasTransition(transitions, locations.get(0), locations.get(1)));
+		assertTrue(hasTransition(transitions, locations.get(1), locations.get(0)));
+	}
+	
+	private boolean hasTransition(Iterable<Transition> transitions, final Object from, final Object to) {
+		return Iterables.any(transitions, new Predicate<Transition>() {
+			@Override
+			public boolean apply(Transition t) {
+				return t.getSource().getRef().equals(from) && t.getTarget().getRef().equals(to);
+			}
+		});
 	}
 
 	private State createState(String value) {
