@@ -130,34 +130,4 @@ public class XmlSerializer {
 
 		return (State) initialStates.iterator().next();
 	}
-
-	protected Hta sampleModel(EObject... objects) {
-		Hta hta = new Hta();
-
-		hta.setDeclaration("int i;");
-
-		Template template = createTemplate("Template");
-		template.setDeclaration("int j;");
-
-		Entry entry = createEntry(template, "ENTRY");
-		Location locationA = createLocation(template, "A");
-		Location locationB = createLocation(template, "B");
-
-		entry.getConnection().add(createConnection(locationA));
-		template.getEntry().add(entry);
-		template.getExit().add(createExit(template, "EXIT"));
-		template.getLocation().add(locationA);
-
-		template.getLocation().add(locationB);
-		template.getTransition().add(createTransition(locationA, locationB));
-
-		hta.getTemplate().add(template);
-
-		hta.setInstantiation("template := new Template();");
-		hta.setSystem("system template");
-
-		hta.getGlobalinit().add(createGlobalinit("template", entry));
-		return hta;
-	}
-
 }
