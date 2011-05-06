@@ -1,8 +1,8 @@
 package org.eclipse.editor.huppaal;
 
 import static org.eclipse.editor.EditorUtil.nvl;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.StringWriter;
@@ -111,15 +111,6 @@ public class XmlSerializerTest {
 		assertEquals("comment", findByKind(t.getLabel(), "comment").getvalue());
 	}
 	
-	private Label findByKind(Iterable<Label> labels, final String kind) {
-		return Iterables.find(labels, new Predicate<Label>() {
-			@Override
-			public boolean apply(Label label) {
-				return label.getKind().equals(kind);
-			}
-		});
-	}
-	
 	@Test
 	public void twoOutgoingEdges() throws Exception {
 		State stateA = createState("A");
@@ -159,6 +150,15 @@ public class XmlSerializerTest {
 		assertEquals(2, transitions.size());
 		assertTrue(hasTransition(transitions, locations.get(0), locations.get(1)));
 		assertTrue(hasTransition(transitions, locations.get(1), locations.get(0)));
+	}
+	
+	private Label findByKind(Iterable<Label> labels, final String kind) {
+		return Iterables.find(labels, new Predicate<Label>() {
+			@Override
+			public boolean apply(Label label) {
+				return label.getKind().equals(kind);
+			}
+		});
 	}
 	
 	private boolean hasTransition(Iterable<Transition> transitions, final Object from, final Object to) {
