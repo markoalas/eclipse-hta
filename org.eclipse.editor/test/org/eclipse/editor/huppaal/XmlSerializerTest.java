@@ -64,7 +64,7 @@ public class XmlSerializerTest {
 		assertEquals(1, hta.getTemplate().size());
 		
 		Location l = hta.getTemplate().get(0).getLocation().get(0);
-		assertEquals("Template.A", l.getId());
+		assertEquals("Template.A.0", l.getId());
 		assertEquals("A", l.getName().getvalue());
 		assertEquals("i < 10", findByKind(l.getLabel(), "invariant").getvalue());
 		assertEquals("true", findByKind(l.getLabel(), "initial").getvalue());

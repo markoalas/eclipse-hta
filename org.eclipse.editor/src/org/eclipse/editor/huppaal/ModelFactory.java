@@ -13,6 +13,8 @@ import org.eclipse.editor.huppaal.model.Template;
 import org.eclipse.editor.huppaal.model.Transition;
 
 public class ModelFactory {
+	private static int idCounter = 0;
+	
 	public static Name createName(String value) {
 		Name name = new Name();
 		name.setvalue(value);
@@ -21,7 +23,7 @@ public class ModelFactory {
 	
 	public static Location createLocation(Template template, String name) {
 		Location location = new Location();
-		location.setId(template.getName().getvalue() + "." + name);
+		location.setId(template.getName().getvalue() + "." + name + "." + (idCounter++));
 		location.setName(createName(name));
 		return location;
 	}
