@@ -8,8 +8,6 @@ package org.eclipse.editor.editor;
 
 import org.eclipse.emf.common.util.EList;
 
-import org.eclipse.emf.ecore.EObject;
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Diagram</b></em>'.
@@ -94,7 +92,7 @@ public interface Diagram extends EndPoint {
 	 * The list contents are of type {@link org.eclipse.editor.editor.Diagram}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Subdiagrams</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Subdiagrams</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->

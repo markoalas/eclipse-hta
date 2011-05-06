@@ -6,15 +6,25 @@
  */
 package org.eclipse.editor.editor.impl;
 
+import java.util.Collection;
+
 import org.eclipse.editor.editor.Connector;
+import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.EditorPackage;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+
+import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+
+import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -23,6 +33,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link org.eclipse.editor.editor.impl.ConnectorImpl#getOutgoingEdges <em>Outgoing Edges</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.ConnectorImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
@@ -30,6 +41,16 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public class ConnectorImpl extends EObjectImpl implements Connector {
+	/**
+	 * The cached value of the '{@link #getOutgoingEdges() <em>Outgoing Edges</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutgoingEdges()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Edge> outgoingEdges;
+
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -74,6 +95,18 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Edge> getOutgoingEdges() {
+		if (outgoingEdges == null) {
+			outgoingEdges = new EObjectWithInverseResolvingEList<Edge>(Edge.class, this, EditorPackage.CONNECTOR__OUTGOING_EDGES, EditorPackage.EDGE__START);
+		}
+		return outgoingEdges;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public String getName() {
 		return name;
 	}
@@ -95,9 +128,40 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoingEdges()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				return ((InternalEList<?>)getOutgoingEdges()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				return getOutgoingEdges();
 			case EditorPackage.CONNECTOR__NAME:
 				return getName();
 		}
@@ -109,9 +173,14 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				getOutgoingEdges().clear();
+				getOutgoingEdges().addAll((Collection<? extends Edge>)newValue);
+				return;
 			case EditorPackage.CONNECTOR__NAME:
 				setName((String)newValue);
 				return;
@@ -127,6 +196,9 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				getOutgoingEdges().clear();
+				return;
 			case EditorPackage.CONNECTOR__NAME:
 				setName(NAME_EDEFAULT);
 				return;
@@ -142,6 +214,8 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
+				return outgoingEdges != null && !outgoingEdges.isEmpty();
 			case EditorPackage.CONNECTOR__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}

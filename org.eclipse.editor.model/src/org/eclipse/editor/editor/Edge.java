@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.EObject;
 public interface Edge extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Start</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link org.eclipse.editor.editor.EndPoint#getOutgoingEdges <em>Outgoing Edges</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Start</em>' reference isn't clear,
@@ -43,7 +44,8 @@ public interface Edge extends EObject {
 	 * @return the value of the '<em>Start</em>' reference.
 	 * @see #setStart(EndPoint)
 	 * @see org.eclipse.editor.editor.EditorPackage#getEdge_Start()
-	 * @model required="true"
+	 * @see org.eclipse.editor.editor.EndPoint#getOutgoingEdges
+	 * @model opposite="outgoingEdges" required="true"
 	 * @generated
 	 */
 	EndPoint getStart();

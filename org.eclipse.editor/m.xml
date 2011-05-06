@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hta SYSTEM "huppaal-0.6.dtd">
+<hta>
+	<template type="XOR">
+		<name>Template</name>
+		<entry id="Template.ENTRY">
+			<name>ENTRY</name>
+			<connection>
+				<target ref="Template.A" />
+			</connection>
+		</entry>
+		<exit id="Template.EXIT">
+			<name>EXIT</name>
+		</exit>
+		<location id="Template.A">
+			<name>A</name>
+		</location>
+	</template>
+	<instantiation>template := Template();</instantiation>
+	<system>system template;</system>
+	<globalinit ref="Template.ENTRY" instantiationname="template" />
+</hta>

@@ -6,7 +6,6 @@
  */
 package org.eclipse.editor.editor;
 
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->

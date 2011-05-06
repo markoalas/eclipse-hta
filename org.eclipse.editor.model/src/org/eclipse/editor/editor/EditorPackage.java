@@ -70,13 +70,22 @@ public interface EditorPackage extends EPackage {
 	int END_POINT = 4;
 
 	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int END_POINT__OUTGOING_EDGES = 0;
+
+	/**
 	 * The number of structural features of the '<em>End Point</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int END_POINT_FEATURE_COUNT = 0;
+	int END_POINT_FEATURE_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.StateImpl <em>State</em>}' class.
@@ -87,6 +96,15 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 */
 	int STATE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__OUTGOING_EDGES = END_POINT__OUTGOING_EDGES;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -153,6 +171,15 @@ public interface EditorPackage extends EPackage {
 	int CONNECTOR = 1;
 
 	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTOR__OUTGOING_EDGES = END_POINT__OUTGOING_EDGES;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -179,6 +206,15 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 */
 	int DIAGRAM = 2;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DIAGRAM__OUTGOING_EDGES = END_POINT__OUTGOING_EDGES;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -233,7 +269,6 @@ public interface EditorPackage extends EPackage {
 	 * @ordered
 	 */
 	int DIAGRAM_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 5;
-
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.
@@ -587,6 +622,17 @@ public interface EditorPackage extends EPackage {
 	EClass getEndPoint();
 
 	/**
+	 * Returns the meta object for the reference list '{@link org.eclipse.editor.editor.EndPoint#getOutgoingEdges <em>Outgoing Edges</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Outgoing Edges</em>'.
+	 * @see org.eclipse.editor.editor.EndPoint#getOutgoingEdges()
+	 * @see #getEndPoint()
+	 * @generated
+	 */
+	EReference getEndPoint_OutgoingEdges();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -809,6 +855,14 @@ public interface EditorPackage extends EPackage {
 		 * @generated
 		 */
 		EClass END_POINT = eINSTANCE.getEndPoint();
+
+		/**
+		 * The meta object literal for the '<em><b>Outgoing Edges</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference END_POINT__OUTGOING_EDGES = eINSTANCE.getEndPoint_OutgoingEdges();
 
 	}
 

@@ -25,7 +25,8 @@
         eType="#//Edge" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Edge">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="start" lowerBound="1" eType="#//EndPoint"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="start" lowerBound="1" eType="#//EndPoint"
+        eOpposite="#//EndPoint/outgoingEdges"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="end" lowerBound="1" eType="#//EndPoint"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="EReference0" eType="#//Diagram"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="Select" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -34,5 +35,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="Update" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="Comments" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="EndPoint" abstract="true" interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="EndPoint" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingEdges" upperBound="-1"
+        eType="#//Edge" eOpposite="#//Edge/start"/>
+  </eClassifiers>
 </ecore:EPackage>

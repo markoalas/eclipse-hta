@@ -12,6 +12,7 @@ import org.eclipse.editor.editor.EditorPackage;
 import org.eclipse.editor.editor.EndPoint;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -220,11 +221,33 @@ public class EdgeImpl extends EObjectImpl implements Edge {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setStart(EndPoint newStart) {
+	public NotificationChain basicSetStart(EndPoint newStart, NotificationChain msgs) {
 		EndPoint oldStart = start;
 		start = newStart;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.EDGE__START, oldStart, start));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, EditorPackage.EDGE__START, oldStart, newStart);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setStart(EndPoint newStart) {
+		if (newStart != start) {
+			NotificationChain msgs = null;
+			if (start != null)
+				msgs = ((InternalEObject)start).eInverseRemove(this, EditorPackage.END_POINT__OUTGOING_EDGES, EndPoint.class, msgs);
+			if (newStart != null)
+				msgs = ((InternalEObject)newStart).eInverseAdd(this, EditorPackage.END_POINT__OUTGOING_EDGES, EndPoint.class, msgs);
+			msgs = basicSetStart(newStart, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.EDGE__START, newStart, newStart));
 	}
 
 	/**
@@ -406,6 +429,36 @@ public class EdgeImpl extends EObjectImpl implements Edge {
 		comments = newComments;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.EDGE__COMMENTS, oldComments, comments));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case EditorPackage.EDGE__START:
+				if (start != null)
+					msgs = ((InternalEObject)start).eInverseRemove(this, EditorPackage.END_POINT__OUTGOING_EDGES, EndPoint.class, msgs);
+				return basicSetStart((EndPoint)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case EditorPackage.EDGE__START:
+				return basicSetStart(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
