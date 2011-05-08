@@ -1,6 +1,7 @@
 package org.eclipse.editor.features;
 
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
@@ -51,6 +52,33 @@ public class ExportXMLFeature extends AbstractCustomFeature {
 			return;
 		}
 
+		exportToFile(fileName);
+	}
+
+	private void exportToFile(String fileName) {
+		log.info("Exporting to file: " + fileName);
+		
+		List<EObject> states = getStatesForCurrentDiagram();
+		
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(fileName);
+			XmlSerializer xmlSerializer = new XmlSerializer();
+			xmlSerializer.toXml(fw, states.toArray(new EObject[states.size()]));
+		} catch (Exception e) {
+			// TODO error should be shown to user also
+			log.error("Unable to export: " + e.getMessage(), e);
+		} finally {
+			try {
+				fw.close();
+			} catch (Exception e) {
+			}
+		}
+		
+		log.info("Export done");
+	}
+
+	private List<EObject> getStatesForCurrentDiagram() {
 		List<EObject> states = Lists.newArrayList();
 		for (PictogramElement pe : getDiagram().getChildren()) {
 			for (Object bo : getAllBusinessObjectsForPictogramElement(pe)) {
@@ -59,21 +87,7 @@ public class ExportXMLFeature extends AbstractCustomFeature {
 				}
 			}
 		}
-
-		log.info("Exporting to file: " + fileName);
-		XmlSerializer xmlSerializer = new XmlSerializer();
-		try {
-			FileOutputStream fos = new FileOutputStream(fileName);
-			try {
-				xmlSerializer.toXml(new OutputStreamWriter(fos), states.toArray(new EObject[] {}));
-			} finally {
-				fos.close();
-			}
-			log.info("Export done");
-		} catch (Exception e) {
-			log.error("Unable to export: " + e.getMessage(), e);
-		}
-		
+		return states;
 	}
 
 	private String askFileName() {
