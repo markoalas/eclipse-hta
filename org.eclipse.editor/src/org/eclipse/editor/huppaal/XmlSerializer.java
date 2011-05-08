@@ -21,14 +21,17 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.editor.EditorUtil;
 import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
+import org.eclipse.editor.huppaal.model.Committed;
 import org.eclipse.editor.huppaal.model.Entry;
 import org.eclipse.editor.huppaal.model.Hta;
 import org.eclipse.editor.huppaal.model.Location;
 import org.eclipse.editor.huppaal.model.Template;
 import org.eclipse.editor.huppaal.model.Transition;
+import org.eclipse.editor.huppaal.model.Urgent;
 import org.eclipse.emf.ecore.EObject;
 
 import com.google.common.base.Predicate;
@@ -94,18 +97,26 @@ public class XmlSerializer {
 			visitedLocations.put(mapKey, location);
 			
 			location.getLabel().add(createLabel("invariant", state.getInvariant()));
-			location.getLabel().add(createLabel("initial", String.valueOf(state.isInitial())));
-			location.getLabel().add(createLabel("committed", String.valueOf(state.isCommitted())));
-			location.getLabel().add(createLabel("urgent", String.valueOf(state.isUrgent())));
+			if (state.isUrgent()) {
+				location.setUrgent(new Urgent());
+			}
+			if (state.isCommitted()) {
+				location.setCommitted(new Committed());
+			}
 
 			for (Edge e : state.getOutgoingEdges()) {
 				Transition transition = createTransition(location, generateFor(template, e.getEnd()));
 				transition.getLabel().add(createLabel("guard", e.getGuard()));
-				transition.getLabel().add(createLabel("select", e.getSelect()));
-				transition.getLabel().add(createLabel("update", e.getUpdate()));
-				transition.getLabel().add(createLabel("sync", e.getSync()));
-				// TODO comment or comments?
-				transition.getLabel().add(createLabel("comment", e.getComments()));
+				
+
+				if (!EditorUtil.isEmpty(e.getSelect())) {
+					transition.getLabel().add(createLabel("select", e.getSelect()));
+				}
+				transition.getLabel().add(createLabel("assignment", e.getUpdate()));
+				transition.getLabel().add(createLabel("synchronisation", e.getSync()));
+				if (!EditorUtil.isEmpty(e.getComments())) {
+					transition.getLabel().add(createLabel("comments", e.getComments()));
+				}
 
 				template.getTransition().add(transition);
 			}

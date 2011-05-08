@@ -1,7 +1,77 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE nta PUBLIC 'nta' 'http://www.brics.dk/~omoeller/hta/xml/uppaal-1.4.dtd'
+[]>
+
+<nta>
+  <!-- TRANSLATED by   Flatten   Vanilla-1 Mon Apr  9 14:28:08 2001
+	          on   May 8, 2011 7:58:42 PM
+	          from a huppaal-0.6.dtd document -->
+  <!--
+        Tree of Instantiations:
+        ROOT1 [AND]
+            template2 [XOR]
+-->
+  <declaration>
 
 // ----- Translation Slack ----- 
 chan  xtSglNR2;
 chan  TmpltENTRYtrtmplt2;
-</declaration><template><name x="0" y="0">globalKickoff3</name><location id="id0" x="40" y="40"><name x="60" y="20">start</name><committed/></location><location id="id1" x="340" y="20"><name x="360" y="0">L1</name></location><init ref="id0"/><transition><source ref="id0"/><target ref="id1"/><label kind="synchronisation" x="185" y="41">TmpltENTRYtrtmplt2!</label></transition></template><template><name x="0" y="0">template2</name><location id="id2" x="40" y="40"><name x="60" y="20">A</name></location><location id="id3" x="340" y="20"><name x="360" y="0">IDLE</name></location><init ref="id3"/><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="215" y="39">TmpltENTRYtrtmplt2?</label></transition></template><system>system template2, globalKickoff3;
-</system></nta>
+</declaration>
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <template>
+    <name x="0" y="0">globalKickoff3</name>
+    <parameter x="600" y="0" />
+    <location x="40" y="40" id="X_ID_4">
+      <name x="60" y="20">start</name>
+      <committed />
+    </location>
+    <location x="340" y="20" id="X_ID_5">
+      <name x="360" y="0">L1</name>
+    </location>
+    <init ref="X_ID_4" />
+    <transition x="190" y="30">
+      <source ref="X_ID_4" />
+      <target ref="X_ID_5" />
+      <label kind="synchronisation" x="185" y="41">TmpltENTRYtrtmplt2!</label>
+    </transition>
+  </template>
+  <!-- ****** END OF TEMPLATE "globalKickoff3"  -->
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <template>
+    <name x="0" y="0">template2</name>
+    <parameter x="600" y="0" />
+    <declaration />
+    <!--ordinary locations-->
+    <location x="40" y="40" id="template2Template.A.5">
+      <name x="60" y="20">A</name>
+    </location>
+    <location x="340" y="20" id="template2Template.B.6">
+      <name x="360" y="0">B</name>
+    </location>
+    <!--now the (former) components-->
+    <!--special location: idle-->
+    <location x="20" y="340" id="X_ID_3">
+      <name x="40" y="320">IDLE</name>
+    </location>
+    <!--entry pseudo-transitions (OR component)-->
+    <init ref="X_ID_3" />
+    <transition x="30" y="190">
+      <source ref="X_ID_3" />
+      <target ref="template2Template.A.5" />
+      <label kind="synchronisation" x="39" y="215">TmpltENTRYtrtmplt2?</label>
+    </transition>
+    <!--ordinary transitions-->
+    <transition x="190" y="30">
+      <source ref="template2Template.A.5" />
+      <target ref="template2Template.B.6" />
+    </transition>
+    <!--exit transitions-->
+  </template>
+  <!-- ****** END OF TEMPLATE "template2"  -->
+  <instantiation>template2 := template2();
+globalKickoff3 := globalKickoff3();</instantiation>
+  <system>system template2, globalKickoff3;
+</system>
+</nta>
+

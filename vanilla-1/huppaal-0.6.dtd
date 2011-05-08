@@ -1,0 +1,224 @@
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+<!-- Tentative hierarchical document definition                    --> 
+<!--                                                               --> 
+<!-- Synopsis:                                                     --> 
+<!--  XML, hierarchical Uppaal                                     --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+<!-- @TABLE OF CONTENTS:		 [TOCD: 16:30 20 Feb 2001] --> 
+<!--								   --> 
+<!--  [1] modified elements here				   --> 
+<!--  [2] classical things below				   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	   --> 
+<!-- @FILE:    huppaal-0.6.dtd                                     --> 
+<!-- @PLACE:   BRICS AArhus; host:harald			   --> 
+<!-- @FORMAT:  XML Document Type Definition                        --> 
+<!-- @AUTHOR:  M. Oliver M'o'ller     <omoeller@brics.dk>          --> 
+<!-- @BEGUN:   Wed Oct 18 14:02:43 2000                            --> 
+<!-- @VERSION  V0.6   Sun Apr  8 18:18:50 2001			   --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+ 
+<!ELEMENT hta (imports?, declaration?, template+, instantiation?, system,
+               globalinit*)> 
+<!ELEMENT imports (#PCDATA)> 
+<!ELEMENT declaration (#PCDATA)> 
+<!-- notes on template:
+ 1. components seem to be a generalization of locations;
+ 
+--> 
+<!ELEMENT template (name,
+                    parameter?,
+                    declaration?,
+                    entry+,
+                    fork*,
+                    exit*,
+                    join*,
+                    location*,
+                    component*,
+                    transition*
+                      )> 
+<!ATTLIST template type CDATA #IMPLIED> <!-- NN --> 
+<!-- the type is intended to be "XOR" (default) or "AND"
+"XOR" means: 
+ * we have locations and transitions
+ * possibly, we have 'components' as generalisations of transitions
+ * there is an <entry>
+ * there might be an <exit>
+ * there is no fork
+ * there is no join
+ 
+"AND" means:
+ * there are no locations, no transitions
+ * there are two or more <component> tags
+ * there is a fork
+ * there is a  <entry>
+ * every <entry> points to a <fork>, thus there is a fork
+ * every fork/join connects *every* component, that is present
+ * optionally, there is an <exit> location
+ * optionally, there is a join
+ 
+  --> 
+<!-- "history" is not specified explicitly in this grammar.
+     The reason for this is, that having a history is not an isolated
+     property, but requires a designated <entry> that has the
+     attribute type="history".
+     this will serve as a defintion. -->  
+ 
+<!-- the instantiates attribute refers to the (textual) NAME of the template
+     (this makes imports easier)
+     The optional labels include invariants, and (possibly) comments.  --> 
+<!ELEMENT component (name, label*)> 
+<!ATTLIST component instantiates   CDATA #REQUIRED
+                    withparameters CDATA #IMPLIED
+                    id             ID    #REQUIRED
+                    x              CDATA #IMPLIED
+                    y              CDATA #IMPLIED> 
+<!-- A connection from here has no source; the target is the location of fork
+     it leads to. 
+     Multiple connections correspond to non-deterministic branching.
+     The type-attribute is uses to denote entries history (or default?)  --> 
+<!ELEMENT entry (name, connection*, entrypoint?)> 
+<!ATTLIST entry id       ID    #REQUIRED
+                type     CDATA #IMPLIED
+                x        CDATA #IMPLIED
+                y        CDATA #IMPLIED> 
+ 
+<!-- if an entrypoint is defined, it *replaces* the entry graphically, if the
+     inside of the component is shown
+     (thus, the transition from it is nicer to display).
+     The notation for this is a small bar (stub) with outgoing arrow and
+     a name
+     (no name means "default entry"; an alternative notation for this is a
+     small bullet)
+     There can be at most one entrypoint per entry --> 
+<!ELEMENT entrypoint EMPTY> 
+<!ATTLIST entrypoint  x        CDATA #IMPLIED
+                      y        CDATA #IMPLIED> 
+ 
+<!-- connections from a fork do not have source, but only a target --> 
+<!ELEMENT fork (name?, connection*)> 
+<!ATTLIST fork  id       ID    #REQUIRED
+                x        CDATA #IMPLIED
+                y        CDATA #IMPLIED> 
+ 
+<!-- the connection to an exit does not have a target, only a source;
+     the type-attribute is used to declare an exit "default-exit"
+     default-exits are only allowed in XOR templates. 
+--> 
+<!ELEMENT exit (name?, connection*, exitpoint*)> 
+<!ATTLIST exit  id       ID    #REQUIRED
+                type     CDATA #IMPLIED
+                x        CDATA #IMPLIED
+                y        CDATA #IMPLIED> 
+ 
+<!-- exitpoints are a notational convenience, and semantically identical
+     with the exit they point to (exit attribute).
+     there can be arbitrary many exitpoints corresponding to the same exit --> 
+<!ELEMENT exitpoint EMPTY> 
+<!ATTLIST exitpoint  id       ID    #REQUIRED
+                     x        CDATA #IMPLIED
+                     y        CDATA #IMPLIED> 
+ 
+<!-- connections to joins do not have a target, only a source --> 
+<!ELEMENT join (name?, connection*)> 
+<!ATTLIST join  id       ID    #REQUIRED
+                x        CDATA #IMPLIED
+                y        CDATA #IMPLIED> 
+ 
+<!-- point to an entry in a global system component, i.e., an instantiation
+     and an entry (ref) of it.
+     the attibute CDATA is by default "no", other values are
+     "all" or "specified".
+     In the "all" case, every exit is a possible starting point.
+     In the "specified" case, the connection elements point to the relevant
+     exits and can also carry synchronisations/guards/assignments. 
+-->             
+<!ELEMENT globalinit (connection)*> 
+<!ATTLIST globalinit instantiationname CDATA #REQUIRED
+                     ref               IDREF #IMPLIED
+		     canexit	       CDATA #IMPLIED> 
+ 
+<!-- ~~ connections, aka pseudo-transitions ~~~~~~~~~~~~~~~~ --> 
+<!ELEMENT connection (source?, target?, label*, nail*)> 
+<!ATTLIST connection type CDATA #IMPLIED
+                     x    CDATA #IMPLIED
+                     y    CDATA #IMPLIED> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- [1] modified elements here					       --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+ 
+ 
+<!-- if source points to a component, then
+     exitref: points to an exit or exitpoint
+     of the template the component instantiates --> 
+<!ELEMENT source EMPTY> 
+<!ATTLIST source ref      IDREF #REQUIRED
+                 exitref  IDREF #IMPLIED> 
+ 
+<!-- if target points to a component, then
+     entryref: points to an entry or entrypoint
+     of the template the component instantiates --> 
+<!ELEMENT target EMPTY> 
+<!ATTLIST target ref      IDREF #REQUIRED
+                 entryref IDREF #IMPLIED> 
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+<!-- [2] classical things below					       --> 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      --> 
+ 
+<!ELEMENT name (#PCDATA)> 
+<!ATTLIST name x   CDATA #IMPLIED
+               y   CDATA #IMPLIED> 
+<!ELEMENT parameter (#PCDATA)> 
+<!ATTLIST parameter x   CDATA #IMPLIED
+                    y   CDATA #IMPLIED> 
+<!ELEMENT location (name, label*, urgent?, committed?)> 
+<!ATTLIST location id ID #REQUIRED
+                   x  CDATA #IMPLIED
+                   y  CDATA #IMPLIED> 
+<!ELEMENT urgent EMPTY> 
+<!ELEMENT committed EMPTY> 
+ 
+<!-- kind: "assignment", "guard", "synchronisation", "invariant" --> 
+<!ELEMENT label (#PCDATA)> 
+<!ATTLIST label kind CDATA #REQUIRED
+                x    CDATA #IMPLIED
+                y    CDATA #IMPLIED> 
+<!ELEMENT nail EMPTY> 
+<!ATTLIST nail x   CDATA #REQUIRED
+               y   CDATA #REQUIRED> 
+<!ELEMENT instantiation (#PCDATA)> 
+<!ELEMENT system (#PCDATA)> 
+ 
+<!ELEMENT transition (source, target, label*, nail*)> 
+<!ATTLIST transition x   CDATA #IMPLIED
+                     y   CDATA #IMPLIED> 
+                                                
+<!-- Change history:
+ 
+0.2: made name of joins optional
+     removed init
+             instead, introduced element globalinit
+     changed "instanciates" to "instantiates"
+     made "parameter" in components optional
+     added optional component part "invariant"
+     changed exit-definition: no "fromref" anymore, exits will be pointed to
+        by transitions (like ordinary locations)
+     introduced <entrypoint> and <exitpoint> as notational alternative
+     joins include an required pointer to an exit
+0.3: allowed more-than-binary branching (AND components/forks/joins)
+     added attribute shape to <hta> (can be "BINTREE" to indicate binary
+     branching structure)
+     added connection element (aka pseudo-transition) and introduced them
+0.4: replaced assignment/guard/synchronisation with the label construct
+0.5: replaced invariant with label construct
+     changed number of connections an entry can have (introduced possibility
+      of nondeterminism).
+     changed globalinit to contain the name of the instantiation as an
+      attribute (necessary, if system should be relaxed to be the parallel
+      composition of some instantiations).
+0.6: added an optional attribute canexit to the globalinit tag
+     added optional connections (possibly with guard and sync) to the
+     globalinit tag 
+--> 
+

@@ -2,10 +2,12 @@ package org.eclipse.editor.huppaal;
 
 import static org.eclipse.editor.EditorUtil.nvl;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.StringWriter;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.editor.editor.Edge;
@@ -32,15 +34,15 @@ public class XmlSerializerTest {
 		xmlSerializer = new XmlSerializer();
 	}
 
-	//@Test
+	@Test
 	public void toXml() throws Exception {
 		StringWriter sw = new StringWriter();
-		xmlSerializer.toXml(sw);
-		System.out.println(sw);
+		xmlSerializer.toXml(sw, createInitialState("A"));
+		assertTrue(sw.toString().length() > 0);
 	}
 
 	@Test
-	public void emptyDocument() throws Exception {
+	public void noInitialState() throws Exception {
 		try {
 			xmlSerializer.generateModel();
 			fail();
@@ -64,12 +66,11 @@ public class XmlSerializerTest {
 		assertEquals(1, hta.getTemplate().size());
 		
 		Location l = hta.getTemplate().get(0).getLocation().get(0);
-		assertEquals("Template.A.0", l.getId());
+		assertTrue(l.getId().matches("Template.A.\\d+"));
 		assertEquals("A", l.getName().getvalue());
 		assertEquals("i < 10", findByKind(l.getLabel(), "invariant").getvalue());
-		assertEquals("true", findByKind(l.getLabel(), "initial").getvalue());
-		assertEquals("true", findByKind(l.getLabel(), "urgent").getvalue());
-		assertEquals("true", findByKind(l.getLabel(), "committed").getvalue());
+		assertNotNull(l.getUrgent());
+		assertNotNull(l.getCommitted());
 		
 		assertEquals("template := Template();", hta.getInstantiation());
 		assertEquals("system template;", hta.getSystem());
@@ -84,12 +85,7 @@ public class XmlSerializerTest {
 		State stateA = createState("A");
 		stateA.setInitial(true);
 		State stateB = createState("B");
-		Edge edge = createEdge(stateA, stateB);
-		edge.setGuard("a == 0");
-		edge.setSelect("select");
-		edge.setSync("s?");
-		edge.setUpdate("a = 1");
-		edge.setComments("comment");
+		createEdge(stateA, stateB);
 		
 		Hta hta = xmlSerializer.generateModel(stateA, stateB);
 		Template template = hta.getTemplate().get(0);
@@ -101,14 +97,7 @@ public class XmlSerializerTest {
 		
 		List<Transition> transitions = template.getTransition();
 		assertEquals(1, transitions.size());
-		Transition t = transitions.get(0);
-		assertEquals(locations.get(0), t.getSource().getRef());
-		assertEquals(locations.get(1), t.getTarget().getRef());
-		assertEquals("a == 0", findByKind(t.getLabel(), "guard").getvalue());
-		assertEquals("select", findByKind(t.getLabel(), "select").getvalue());
-		assertEquals("s?", findByKind(t.getLabel(), "sync").getvalue());
-		assertEquals("a = 1", findByKind(t.getLabel(), "update").getvalue());
-		assertEquals("comment", findByKind(t.getLabel(), "comment").getvalue());
+		hasTransition(transitions, locations.get(0), locations.get(1));
 	}
 	
 	@Test
@@ -130,6 +119,8 @@ public class XmlSerializerTest {
 		assertEquals(2, transitions.size());
 		assertTrue(hasTransition(transitions, locations.get(0), locations.get(1)));
 		assertTrue(hasTransition(transitions, locations.get(0), locations.get(2)));
+		assertNull(findByKind(transitions.get(0).getLabel(), "select"));
+		assertNull(findByKind(transitions.get(0).getLabel(), "comments"));
 	}
 	
 	@Test
@@ -152,13 +143,67 @@ public class XmlSerializerTest {
 		assertTrue(hasTransition(transitions, locations.get(1), locations.get(0)));
 	}
 	
+	@Test
+	public void transitionProperties_EverythingIsSet() throws Exception {
+		State stateA = createState("A");
+		stateA.setInitial(true);
+		State stateB = createState("B");
+		Edge edge = createEdge(stateA, stateB);
+		edge.setGuard("a == 0");
+		edge.setSelect("select");
+		edge.setSync("s?");
+		edge.setUpdate("a = 1");
+		edge.setComments("comment");
+		
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		Template template = hta.getTemplate().get(0);
+		
+		List<Location> locations = template.getLocation();
+		Transition t = template.getTransition().get(0);
+		
+		assertEquals(locations.get(0), t.getSource().getRef());
+		assertEquals(locations.get(1), t.getTarget().getRef());
+		assertEquals("a == 0", findByKind(t.getLabel(), "guard").getvalue());
+		assertEquals("select", findByKind(t.getLabel(), "select").getvalue());
+		assertEquals("s?", findByKind(t.getLabel(), "synchronisation").getvalue());
+		assertEquals("a = 1", findByKind(t.getLabel(), "assignment").getvalue());
+		assertEquals("comment", findByKind(t.getLabel(), "comments").getvalue());
+	}
+	
+	/**
+	 * select and comments must be skipped when they are empty because 
+	 * huppaal -> uppaal converter does not support them.
+	 */
+	@Test
+	public void transitionProperties_NothingIsSet() throws Exception {
+		State stateA = createState("A");
+		stateA.setInitial(true);
+		State stateB = createState("B");
+		createEdge(stateA, stateB);
+		
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		Template template = hta.getTemplate().get(0);
+		
+		Transition transition = template.getTransition().get(0);
+		assertNull(findByKind(transition.getLabel(), "select"));
+		assertNull(findByKind(transition.getLabel(), "comments"));
+		assertEquals("", nvl(findByKind(transition.getLabel(), "assignment").getvalue()));
+		assertEquals("", nvl(findByKind(transition.getLabel(), "synchronisation").getvalue()));
+	}
+	
 	private Label findByKind(Iterable<Label> labels, final String kind) {
-		return Iterables.find(labels, new Predicate<Label>() {
+		Iterator<Label> it = Iterables.filter(labels, new Predicate<Label>() {
 			@Override
 			public boolean apply(Label label) {
 				return label.getKind().equals(kind);
 			}
-		});
+		}).iterator();
+		
+		if (it.hasNext()) {
+			return it.next();
+		}
+		
+		return null;
 	}
 	
 	private boolean hasTransition(Iterable<Transition> transitions, final Object from, final Object to) {
@@ -168,6 +213,12 @@ public class XmlSerializerTest {
 				return t.getSource().getRef().equals(from) && t.getTarget().getRef().equals(to);
 			}
 		});
+	}
+	
+	private State createInitialState(String value) {
+		State state = createState(value);
+		state.setInitial(true);
+		return state;
 	}
 
 	private State createState(String value) {
