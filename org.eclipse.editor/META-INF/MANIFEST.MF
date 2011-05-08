@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Editor
 Bundle-SymbolicName: org.eclipse.editor;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.editor.huppaal.Activator
+Bundle-Activator: org.eclipse.editor.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.graphiti;bundle-version="0.7.1",

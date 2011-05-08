@@ -11,7 +11,7 @@
    
    <extension point="org.eclipse.graphiti.ui.diagramTypeProviders">
       <diagramTypeProvider
-            class="org.eclipse.editor.huppaal.DiagramTypeProvider"
+            class="org.eclipse.editor.DiagramTypeProvider"
             id="org.eclipse.editor.diagramTypeProvider"
             name="org.eclipse.editor.diagramTypeProvider">
             <diagramType id="org.eclipse.editor.diagramType"/>

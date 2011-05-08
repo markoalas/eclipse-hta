@@ -5,6 +5,7 @@ import static org.eclipse.editor.Log.withLogging;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
+import org.eclipse.editor.features.ExportXMLFeature;
 import org.eclipse.editor.features.connector.AddConnectorFeature;
 import org.eclipse.editor.features.connector.CreateConnectorFeature;
 import org.eclipse.editor.features.connector.UpdateConnectorFeature;
@@ -81,6 +82,6 @@ public class FeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { withLogging(ICustomFeature.class, new DrillDownFeature(this)) };
+		return new ICustomFeature[] { withLogging(ICustomFeature.class, new DrillDownFeature(this)), withLogging(ICustomFeature.class, new ExportXMLFeature(this)) };
 	}
 }
