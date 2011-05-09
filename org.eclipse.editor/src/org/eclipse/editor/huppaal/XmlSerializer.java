@@ -20,9 +20,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.editor.EditorUtil;
-import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.huppaal.model.Committed;
@@ -39,15 +37,9 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 
 public class XmlSerializer {
-	private static Logger log = Log.getLogger();
-
-	public void toXml(Writer sw, EObject... objects) {
-		try {
-			Hta hta = generateModel(objects);
-			writeHta(hta, sw);
-		} catch (Exception e) {
-			log.error("Unable to serialize to XML: " + e.getMessage(), e);
-		}
+	public void toXml(Writer sw, EObject... objects) throws PropertyException, JAXBException {
+		Hta hta = generateModel(objects);
+		writeHta(hta, sw);
 	}
 
 	private void writeHta(Hta hta, Writer writer) throws JAXBException, PropertyException {
@@ -81,7 +73,7 @@ public class XmlSerializer {
 		hta.getGlobalinit().add(createGlobalinit("template", entry));
 		return hta;
 	}
-	
+
 	private Map<String, Location> visitedLocations = Maps.newHashMap();
 
 	private Object generateFor(Template template, EObject root) {
@@ -91,11 +83,11 @@ public class XmlSerializer {
 			if (visitedLocations.containsKey(mapKey)) {
 				return visitedLocations.get(mapKey);
 			}
-			
+
 			Location location = createLocation(template, state.getName());
 			template.getLocation().add(location);
 			visitedLocations.put(mapKey, location);
-			
+
 			location.getLabel().add(createLabel("invariant", state.getInvariant()));
 			if (state.isUrgent()) {
 				location.setUrgent(new Urgent());
@@ -107,7 +99,6 @@ public class XmlSerializer {
 			for (Edge e : state.getOutgoingEdges()) {
 				Transition transition = createTransition(location, generateFor(template, e.getEnd()));
 				transition.getLabel().add(createLabel("guard", e.getGuard()));
-				
 
 				if (!EditorUtil.isEmpty(e.getSelect())) {
 					transition.getLabel().add(createLabel("select", e.getSelect()));
