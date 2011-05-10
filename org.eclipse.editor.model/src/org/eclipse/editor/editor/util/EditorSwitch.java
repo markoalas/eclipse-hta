@@ -104,7 +104,6 @@ public class EditorSwitch<T> {
 			case EditorPackage.DIAGRAM: {
 				Diagram diagram = (Diagram)theEObject;
 				T result = caseDiagram(diagram);
-				if (result == null) result = caseEndPoint(diagram);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

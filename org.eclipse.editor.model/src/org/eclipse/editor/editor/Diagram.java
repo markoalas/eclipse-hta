@@ -7,6 +7,7 @@
 package org.eclipse.editor.editor;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -28,7 +29,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Diagram extends EndPoint {
+public interface Diagram extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -58,6 +59,7 @@ public interface Diagram extends EndPoint {
 	/**
 	 * Returns the value of the '<em><b>Connectors</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.editor.editor.Connector}.
+	 * It is bidirectional and its opposite is '{@link org.eclipse.editor.editor.Connector#getDiagram <em>Diagram</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Connectors</em>' containment reference list isn't clear,
@@ -66,7 +68,8 @@ public interface Diagram extends EndPoint {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Connectors</em>' containment reference list.
 	 * @see org.eclipse.editor.editor.EditorPackage#getDiagram_Connectors()
-	 * @model containment="true"
+	 * @see org.eclipse.editor.editor.Connector#getDiagram
+	 * @model opposite="diagram" containment="true"
 	 * @generated
 	 */
 	EList<Connector> getConnectors();

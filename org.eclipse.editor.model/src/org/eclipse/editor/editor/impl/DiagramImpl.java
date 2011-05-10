@@ -26,6 +26,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -36,7 +37,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getOutgoingEdges <em>Outgoing Edges</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getName <em>Name</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getConnectors <em>Connectors</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getStates <em>States</em>}</li>
@@ -48,16 +48,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class DiagramImpl extends EObjectImpl implements Diagram {
-	/**
-	 * The cached value of the '{@link #getOutgoingEdges() <em>Outgoing Edges</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getOutgoingEdges()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Edge> outgoingEdges;
-
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -142,18 +132,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Edge> getOutgoingEdges() {
-		if (outgoingEdges == null) {
-			outgoingEdges = new EObjectWithInverseResolvingEList<Edge>(Edge.class, this, EditorPackage.DIAGRAM__OUTGOING_EDGES, EditorPackage.EDGE__START);
-		}
-		return outgoingEdges;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public String getName() {
 		return name;
 	}
@@ -177,7 +155,7 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 */
 	public EList<Connector> getConnectors() {
 		if (connectors == null) {
-			connectors = new EObjectContainmentEList<Connector>(Connector.class, this, EditorPackage.DIAGRAM__CONNECTORS);
+			connectors = new EObjectContainmentWithInverseEList<Connector>(Connector.class, this, EditorPackage.DIAGRAM__CONNECTORS, EditorPackage.CONNECTOR__DIAGRAM);
 		}
 		return connectors;
 	}
@@ -227,8 +205,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoingEdges()).basicAdd(otherEnd, msgs);
+			case EditorPackage.DIAGRAM__CONNECTORS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getConnectors()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -241,8 +219,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				return ((InternalEList<?>)getOutgoingEdges()).basicRemove(otherEnd, msgs);
 			case EditorPackage.DIAGRAM__CONNECTORS:
 				return ((InternalEList<?>)getConnectors()).basicRemove(otherEnd, msgs);
 			case EditorPackage.DIAGRAM__STATES:
@@ -263,8 +239,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				return getOutgoingEdges();
 			case EditorPackage.DIAGRAM__NAME:
 				return getName();
 			case EditorPackage.DIAGRAM__CONNECTORS:
@@ -288,10 +262,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				getOutgoingEdges().clear();
-				getOutgoingEdges().addAll((Collection<? extends Edge>)newValue);
-				return;
 			case EditorPackage.DIAGRAM__NAME:
 				setName((String)newValue);
 				return;
@@ -323,9 +293,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				getOutgoingEdges().clear();
-				return;
 			case EditorPackage.DIAGRAM__NAME:
 				setName(NAME_EDEFAULT);
 				return;
@@ -353,8 +320,6 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case EditorPackage.DIAGRAM__OUTGOING_EDGES:
-				return outgoingEdges != null && !outgoingEdges.isEmpty();
 			case EditorPackage.DIAGRAM__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case EditorPackage.DIAGRAM__CONNECTORS:

@@ -189,13 +189,22 @@ public interface EditorPackage extends EPackage {
 	int CONNECTOR__NAME = END_POINT_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Diagram</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONNECTOR__DIAGRAM = END_POINT_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Connector</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONNECTOR_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 1;
+	int CONNECTOR_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.DiagramImpl <em>Diagram</em>}' class.
@@ -208,22 +217,13 @@ public interface EditorPackage extends EPackage {
 	int DIAGRAM = 2;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing Edges</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DIAGRAM__OUTGOING_EDGES = END_POINT__OUTGOING_EDGES;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__NAME = END_POINT_FEATURE_COUNT + 0;
+	int DIAGRAM__NAME = 0;
 
 	/**
 	 * The feature id for the '<em><b>Connectors</b></em>' containment reference list.
@@ -232,7 +232,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__CONNECTORS = END_POINT_FEATURE_COUNT + 1;
+	int DIAGRAM__CONNECTORS = 1;
 
 	/**
 	 * The feature id for the '<em><b>States</b></em>' containment reference list.
@@ -241,7 +241,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__STATES = END_POINT_FEATURE_COUNT + 2;
+	int DIAGRAM__STATES = 2;
 
 	/**
 	 * The feature id for the '<em><b>Subdiagrams</b></em>' containment reference list.
@@ -250,7 +250,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__SUBDIAGRAMS = END_POINT_FEATURE_COUNT + 3;
+	int DIAGRAM__SUBDIAGRAMS = 3;
 
 	/**
 	 * The feature id for the '<em><b>Edges</b></em>' containment reference list.
@@ -259,7 +259,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM__EDGES = END_POINT_FEATURE_COUNT + 4;
+	int DIAGRAM__EDGES = 4;
 
 	/**
 	 * The number of structural features of the '<em>Diagram</em>' class.
@@ -268,7 +268,7 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM_FEATURE_COUNT = END_POINT_FEATURE_COUNT + 5;
+	int DIAGRAM_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.
@@ -447,6 +447,17 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getConnector_Name();
+
+	/**
+	 * Returns the meta object for the container reference '{@link org.eclipse.editor.editor.Connector#getDiagram <em>Diagram</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Diagram</em>'.
+	 * @see org.eclipse.editor.editor.Connector#getDiagram()
+	 * @see #getConnector()
+	 * @generated
+	 */
+	EReference getConnector_Diagram();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.editor.editor.Diagram <em>Diagram</em>}'.
@@ -721,6 +732,14 @@ public interface EditorPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute CONNECTOR__NAME = eINSTANCE.getConnector_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Diagram</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CONNECTOR__DIAGRAM = eINSTANCE.getConnector_Diagram();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.editor.editor.impl.DiagramImpl <em>Diagram</em>}' class.

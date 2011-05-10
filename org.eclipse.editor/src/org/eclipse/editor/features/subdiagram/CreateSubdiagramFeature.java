@@ -23,7 +23,6 @@ public class CreateSubdiagramFeature extends AbstractCreateFeature {
     public Object[] create(ICreateContext context) {
         String name = ExampleUtil.askString(TITLE, USER_QUESTION, "");
         if (name == null || name.trim().length() == 0) {
-        	System.out.println("No name!");
             return EMPTY;
         }
 
@@ -31,6 +30,7 @@ public class CreateSubdiagramFeature extends AbstractCreateFeature {
         getDiagram().eResource().getContents().add(diagram);
         diagram.setName(name);
         addGraphicalRepresentation(context, diagram);
+        //link(getDiagram(), diagram);
 
         return new Object[] { diagram };
     }

@@ -7,12 +7,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.*;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.editor.editor.Connector;
+import org.eclipse.editor.editor.Diagram;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.EditorFactory;
+import org.eclipse.editor.editor.EndPoint;
 import org.eclipse.editor.editor.State;
+import org.eclipse.editor.huppaal.model.Component;
 import org.eclipse.editor.huppaal.model.Entry;
 import org.eclipse.editor.huppaal.model.Globalinit;
 import org.eclipse.editor.huppaal.model.Hta;
@@ -53,9 +59,7 @@ public class XmlSerializerTest {
 	
 	@Test
 	public void onlyInitialState() throws Exception {
-		State state = EditorFactory.eINSTANCE.createState();
-		state.setInitial(true);
-		state.setName("A");
+		State state = createInitialState("A"); 
 		state.setInvariant("i < 10");
 		state.setUrgent(true);
 		state.setCommitted(true);
@@ -82,8 +86,7 @@ public class XmlSerializerTest {
 
 	@Test
 	public void twoStatesAndAnEdge() throws Exception {
-		State stateA = createState("A");
-		stateA.setInitial(true);
+		State stateA = createInitialState("A");
 		State stateB = createState("B");
 		createEdge(stateA, stateB);
 		
@@ -91,9 +94,7 @@ public class XmlSerializerTest {
 		Template template = hta.getTemplate().get(0);
 		
 		List<Location> locations = template.getLocation();
-		assertEquals(2, locations.size());
-		assertEquals("A", locations.get(0).getName().getvalue());
-		assertEquals("B", locations.get(1).getName().getvalue());
+		assertLocations(locations, Arrays.asList("A", "B"));
 		
 		List<Transition> transitions = template.getTransition();
 		assertEquals(1, transitions.size());
@@ -102,8 +103,7 @@ public class XmlSerializerTest {
 	
 	@Test
 	public void twoOutgoingEdges() throws Exception {
-		State stateA = createState("A");
-		stateA.setInitial(true);
+		State stateA = createInitialState("A");
 		State stateB = createState("B");
 		State stateC = createState("C");
 		createEdge(stateA, stateB);
@@ -125,8 +125,7 @@ public class XmlSerializerTest {
 	
 	@Test
 	public void cyclic() throws Exception {
-		State stateA = createState("A");
-		stateA.setInitial(true);
+		State stateA = createInitialState("A");
 		State stateB = createState("B");
 		createEdge(stateA, stateB);
 		createEdge(stateB, stateA);
@@ -145,8 +144,7 @@ public class XmlSerializerTest {
 	
 	@Test
 	public void transitionProperties_EverythingIsSet() throws Exception {
-		State stateA = createState("A");
-		stateA.setInitial(true);
+		State stateA = createInitialState("A");
 		State stateB = createState("B");
 		Edge edge = createEdge(stateA, stateB);
 		edge.setGuard("a == 0");
@@ -176,8 +174,7 @@ public class XmlSerializerTest {
 	 */
 	@Test
 	public void transitionProperties_NothingIsSet() throws Exception {
-		State stateA = createState("A");
-		stateA.setInitial(true);
+		State stateA = createInitialState("A");
 		State stateB = createState("B");
 		createEdge(stateA, stateB);
 		
@@ -189,6 +186,53 @@ public class XmlSerializerTest {
 		assertNull(findByKind(transition.getLabel(), "comments"));
 		assertEquals("", nvl(findByKind(transition.getLabel(), "assignment").getvalue()));
 		assertEquals("", nvl(findByKind(transition.getLabel(), "synchronisation").getvalue()));
+	}
+	
+	@Test
+	public void withSubdiagram() throws Exception {
+		State stateA = createInitialState("A");
+		Diagram subDiagram = createDiagram("sub");
+		Connector connector1 = createConnector(subDiagram, "con1");
+		Connector connector2 = createConnector(subDiagram, "con2");
+		State stateB = createState("B");
+		State stateC = createState("C");
+		
+		createEdge(stateA, connector1);
+		createEdge(connector1, stateC);
+		createEdge(stateC, connector2);
+		createEdge(connector2, stateB);
+		
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		List<Template> templates = hta.getTemplate();
+		assertEquals(2, templates.size());
+		
+		Template template = templates.get(0);
+		List<Location> locations = template.getLocation();
+		List<Transition> transitions = template.getTransition();
+		
+		Template subTemplate = templates.get(1);
+		List<Location> subLocations = subTemplate.getLocation();
+		List<Transition> subTransitions = subTemplate.getTransition();
+		
+		Component component = template.getComponent().get(0);
+		assertEquals(subTemplate.getName().getvalue(), component.getInstantiates());
+		assertTrue(component.getId().matches("Template.\\d+"));
+		
+		assertEquals(1, subTemplate.getEntry().size());
+		assertEquals(1, subTemplate.getExit().size());
+		assertLocations(locations, Arrays.asList("A", "B"));
+		
+		assertEquals(2, transitions.size());
+		// ref - component id; entryref & exitref
+		assertTrue(hasTransition(transitions, locations.get(0), subTemplate.getComponent().get(0)));
+		assertTrue(hasTransition(transitions, subTemplate.getComponent().get(0), locations.get(1)));
+		
+		assertLocations(subLocations, Arrays.asList("C"));
+		assertEquals(1, subTransitions.size());
+		assertTrue(hasTransition(subTransitions, subLocations.get(0), subTemplate.getExit().get(0)));
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getEntry().get(0).getConnection().get(0).getTarget().getRef());
+		
+		
 	}
 	
 	private Label findByKind(Iterable<Label> labels, final String kind) {
@@ -215,6 +259,23 @@ public class XmlSerializerTest {
 		});
 	}
 	
+	private void assertLocations(final Collection<Location> locations, final Collection<String> names) {
+		assertEquals(names.size(), locations.size());
+		
+		assertTrue(Iterables.all(names, new Predicate<String>() {
+			@Override
+			public boolean apply(final String name) {
+				return Iterables.any(locations, new Predicate<Location>() {
+					@Override
+					public boolean apply(Location location) {
+						return location.getName().getvalue().equals(name);
+					}
+					
+				});
+			}
+		}));
+	}
+	
 	private State createInitialState(String value) {
 		State state = createState(value);
 		state.setInitial(true);
@@ -227,11 +288,24 @@ public class XmlSerializerTest {
 		return state;
 	}
 	
-	private Edge createEdge(State start, State end) {
+	private Edge createEdge(EndPoint start, EndPoint end) {
 		Edge edge = EditorFactory.eINSTANCE.createEdge();
 		edge.setStart(start);
 		edge.setEnd(end);
 		return edge;
+	}
+	
+	private Connector createConnector(Diagram diagram, String name) {
+		Connector connector = EditorFactory.eINSTANCE.createConnector();
+		connector.setName(name);
+		connector.setDiagram(diagram);
+		return connector;
+	}
+	
+	private Diagram createDiagram(String name) {
+		Diagram d = EditorFactory.eINSTANCE.createDiagram();
+		d.setName(name);
+		return d;
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.eclipse.editor.huppaal;
 
+import org.eclipse.editor.huppaal.model.Component;
 import org.eclipse.editor.huppaal.model.Connection;
 import org.eclipse.editor.huppaal.model.Entry;
 import org.eclipse.editor.huppaal.model.Exit;
@@ -37,7 +38,7 @@ public class ModelFactory {
 
 	public static Exit createExit(Template template, String name) {
 		Exit exit = new Exit();
-		exit.setId(template.getName().getvalue() +  "." + name);
+		exit.setId(template.getName().getvalue() +  "." + name + (idCounter++));
 		exit.setName(createName(name));
 		return exit;
 	}
@@ -85,4 +86,14 @@ public class ModelFactory {
 		label.setvalue(value);
 		return label;
 	}
+	
+	public static Component createComponent(Template template, Template subTemplate) {
+		Component c = new Component();
+		c.setInstantiates(subTemplate.getName().getvalue());
+		c.setId(template.getName().getvalue() + "." + (idCounter++));
+		c.setName(createName("N" + (idCounter++)));
+		return c;
+	}
+
+
 }

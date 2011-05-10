@@ -201,6 +201,15 @@ public class EditorPackageImpl extends EPackageImpl implements EditorPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getConnector_Diagram() {
+		return (EReference)connectorEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getDiagram() {
 		return diagramEClass;
 	}
@@ -386,6 +395,7 @@ public class EditorPackageImpl extends EPackageImpl implements EditorPackage {
 
 		connectorEClass = createEClass(CONNECTOR);
 		createEAttribute(connectorEClass, CONNECTOR__NAME);
+		createEReference(connectorEClass, CONNECTOR__DIAGRAM);
 
 		diagramEClass = createEClass(DIAGRAM);
 		createEAttribute(diagramEClass, DIAGRAM__NAME);
@@ -438,7 +448,6 @@ public class EditorPackageImpl extends EPackageImpl implements EditorPackage {
 		// Add supertypes to classes
 		stateEClass.getESuperTypes().add(this.getEndPoint());
 		connectorEClass.getESuperTypes().add(this.getEndPoint());
-		diagramEClass.getESuperTypes().add(this.getEndPoint());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -450,10 +459,11 @@ public class EditorPackageImpl extends EPackageImpl implements EditorPackage {
 
 		initEClass(connectorEClass, Connector.class, "Connector", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getConnector_Name(), ecorePackage.getEString(), "Name", null, 0, 1, Connector.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getConnector_Diagram(), this.getDiagram(), this.getDiagram_Connectors(), "diagram", null, 1, 1, Connector.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(diagramEClass, Diagram.class, "Diagram", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDiagram_Name(), ecorePackage.getEString(), "Name", null, 0, 1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDiagram_Connectors(), this.getConnector(), null, "connectors", null, 0, -1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDiagram_Connectors(), this.getConnector(), this.getConnector_Diagram(), "connectors", null, 0, -1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDiagram_States(), this.getState(), null, "states", null, 0, -1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDiagram_Subdiagrams(), this.getDiagram(), null, "subdiagrams", null, 0, -1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getDiagram_Edges(), this.getEdge(), null, "edges", null, 0, -1, Diagram.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

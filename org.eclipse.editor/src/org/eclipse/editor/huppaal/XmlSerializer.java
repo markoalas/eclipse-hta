@@ -1,5 +1,6 @@
 package org.eclipse.editor.huppaal;
 
+import static org.eclipse.editor.huppaal.ModelFactory.createComponent;
 import static org.eclipse.editor.huppaal.ModelFactory.createConnection;
 import static org.eclipse.editor.huppaal.ModelFactory.createEntry;
 import static org.eclipse.editor.huppaal.ModelFactory.createExit;
@@ -14,6 +15,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Stack;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,10 +23,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
 import org.eclipse.editor.EditorUtil;
+import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.huppaal.model.Committed;
 import org.eclipse.editor.huppaal.model.Entry;
+import org.eclipse.editor.huppaal.model.Exit;
 import org.eclipse.editor.huppaal.model.Hta;
 import org.eclipse.editor.huppaal.model.Location;
 import org.eclipse.editor.huppaal.model.Template;
@@ -52,9 +56,11 @@ public class XmlSerializer {
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.marshal(hta, writer);
 	}
+	
+	private Hta hta;
 
 	protected Hta generateModel(EObject... objects) {
-		Hta hta = new Hta();
+		hta = new Hta();
 
 		Template template = createTemplate("Template");
 		hta.getTemplate().add(template);
@@ -74,8 +80,11 @@ public class XmlSerializer {
 		return hta;
 	}
 
+	// connectorisse tagasi minek annab errori?
 	private Map<String, Location> visitedLocations = Maps.newHashMap();
-
+	private Map<String, Template> templates = Maps.newHashMap();
+	private Stack<Template> templatesStack = new Stack<Template>(); 
+	
 	private Object generateFor(Template template, EObject root) {
 		if (root instanceof State) {
 			State state = (State) root;
@@ -97,25 +106,64 @@ public class XmlSerializer {
 			}
 
 			for (Edge e : state.getOutgoingEdges()) {
-				Transition transition = createTransition(location, generateFor(template, e.getEnd()));
-				transition.getLabel().add(createLabel("guard", e.getGuard()));
-
-				if (!EditorUtil.isEmpty(e.getSelect())) {
-					transition.getLabel().add(createLabel("select", e.getSelect()));
-				}
-				transition.getLabel().add(createLabel("assignment", e.getUpdate()));
-				transition.getLabel().add(createLabel("synchronisation", e.getSync()));
-				if (!EditorUtil.isEmpty(e.getComments())) {
-					transition.getLabel().add(createLabel("comments", e.getComments()));
-				}
-
+				Transition transition = createTransitionForEdge(template, location, e);
 				template.getTransition().add(transition);
 			}
 
 			return location;
+		} else if (root instanceof Connector) {
+			Connector connector = (Connector)root;
+			
+			String templateName = connector.getDiagram().getName();
+			if (!templates.containsKey(templateName)) {
+				Template t = createTemplate(templateName);
+				templates.put(templateName, t);
+				hta.getTemplate().add(t);
+			}
+			
+			Template subTemplate = templates.get(templateName);
+			if (!templateName.equals(template.getName().getvalue())) {
+				templatesStack.push(template);
+				
+				template.getComponent().add(createComponent(template, subTemplate));
+				
+				Entry entry = createEntry(subTemplate, "ENTRY");
+				subTemplate.getEntry().add(entry);
+			
+				for (Edge e : connector.getOutgoingEdges()) {
+					entry.getConnection().add(createConnection(generateFor(subTemplate, e.getEnd())));
+				}
+				
+				return entry;
+			}
+			else {
+				Exit exit = createExit(subTemplate, "EXIT");
+				subTemplate.getExit().add(exit);
+				Template upperTemplate = templatesStack.pop();
+				for (Edge e : connector.getOutgoingEdges()) {
+					upperTemplate.getTransition().add(createTransition(exit, generateFor(upperTemplate, e.getEnd())));
+				}
+				
+				return exit;
+			}
 		}
 
-		throw new IllegalArgumentException("Unknown EObject type");
+		throw new IllegalArgumentException("Unknown EObject type: " + root.getClass().getSimpleName());
+	}
+
+	private Transition createTransitionForEdge(Template template, Location location, Edge e) {
+		Transition transition = createTransition(location, generateFor(template, e.getEnd()));
+		transition.getLabel().add(createLabel("guard", e.getGuard()));
+
+		if (!EditorUtil.isEmpty(e.getSelect())) {
+			transition.getLabel().add(createLabel("select", e.getSelect()));
+		}
+		transition.getLabel().add(createLabel("assignment", e.getUpdate()));
+		transition.getLabel().add(createLabel("synchronisation", e.getSync()));
+		if (!EditorUtil.isEmpty(e.getComments())) {
+			transition.getLabel().add(createLabel("comments", e.getComments()));
+		}
+		return transition;
 	}
 
 	private State findInitialState(EObject[] objects) {

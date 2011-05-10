@@ -39,6 +39,7 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 		Connection newConnection = null;
 
 		Edge edge = EditorFactory.eINSTANCE.createEdge();
+		// getEndPoint annab diagrammi, meil on vaja connector sealt seest otsida.
 		edge.setStart(getEndPoint(context.getSourceAnchor()));
 		edge.setEnd(getEndPoint(context.getTargetAnchor()));
 		getDiagram().eResource().getContents().add(edge);
@@ -55,7 +56,12 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 			return null;
 		}
 		
-		Object pe = getBusinessObjectForPictogramElement(anchor.getParent());
+		Object pe = getBusinessObjectForPictogramElement(anchor);
+		if (pe instanceof EndPoint) {
+			return (EndPoint)pe;
+		}
+		
+		pe = getBusinessObjectForPictogramElement(anchor.getParent());
 		if (pe instanceof EndPoint) {
 			return (EndPoint)pe;
 		}

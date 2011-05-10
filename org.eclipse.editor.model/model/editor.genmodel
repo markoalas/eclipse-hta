@@ -16,6 +16,7 @@
     </genClasses>
     <genClasses ecoreClass="editor.ecore#//Connector">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute editor.ecore#//Connector/Name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference editor.ecore#//Connector/diagram"/>
     </genClasses>
     <genClasses ecoreClass="editor.ecore#//Diagram">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute editor.ecore#//Diagram/Name"/>

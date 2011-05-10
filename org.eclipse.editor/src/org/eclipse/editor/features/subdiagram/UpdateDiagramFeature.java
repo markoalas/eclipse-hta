@@ -11,7 +11,9 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static org.eclipse.editor.EditorUtil.cast;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +49,7 @@ import com.google.common.primitives.Ints;
 
 public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	private static final Logger log = Log.getLogger();
-	
+
 	public UpdateDiagramFeature(IFeatureProvider fp) {
 		super(fp);
 	}
@@ -118,7 +120,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		return new Predicate<PictogramElement>() {
 			@Override
 			public boolean apply(PictogramElement e) {
-				return getBusinessObjectForPictogramElement(e) instanceof Connector;
+				return Iterables.any(Arrays.asList(getAllBusinessObjectsForPictogramElement(e)), instanceOf(Connector.class));
 			}
 		};
 	}
@@ -147,8 +149,10 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 		Collection<BoxRelativeAnchor> relativeAnchors = (Collection) filter(cs.getAnchors(), instanceOf(BoxRelativeAnchor.class));
 
 		for (BoxRelativeAnchor a : relativeAnchors) {
-			Connector connector = (Connector) Iterables.find(a.getLink().getBusinessObjects(), instanceOf(Connector.class));
-			anchors.put(connector, a);
+			Iterable<EObject> connectors = Iterables.filter(a.getLink().getBusinessObjects(), instanceOf(Connector.class));
+			for(EObject c : connectors) {
+				anchors.put((Connector)c, a);
+			}
 		}
 
 		return anchors;

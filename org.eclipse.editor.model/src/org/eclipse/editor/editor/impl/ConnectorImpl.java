@@ -9,6 +9,7 @@ package org.eclipse.editor.editor.impl;
 import java.util.Collection;
 
 import org.eclipse.editor.editor.Connector;
+import org.eclipse.editor.editor.Diagram;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.EditorPackage;
 
@@ -24,6 +25,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -35,6 +37,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link org.eclipse.editor.editor.impl.ConnectorImpl#getOutgoingEdges <em>Outgoing Edges</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.ConnectorImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.ConnectorImpl#getDiagram <em>Diagram</em>}</li>
  * </ul>
  * </p>
  *
@@ -128,12 +131,57 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Diagram getDiagram() {
+		if (eContainerFeatureID() != EditorPackage.CONNECTOR__DIAGRAM) return null;
+		return (Diagram)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetDiagram(Diagram newDiagram, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newDiagram, EditorPackage.CONNECTOR__DIAGRAM, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setDiagram(Diagram newDiagram) {
+		if (newDiagram != eInternalContainer() || (eContainerFeatureID() != EditorPackage.CONNECTOR__DIAGRAM && newDiagram != null)) {
+			if (EcoreUtil.isAncestor(this, newDiagram))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newDiagram != null)
+				msgs = ((InternalEObject)newDiagram).eInverseAdd(this, EditorPackage.DIAGRAM__CONNECTORS, Diagram.class, msgs);
+			msgs = basicSetDiagram(newDiagram, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.CONNECTOR__DIAGRAM, newDiagram, newDiagram));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getOutgoingEdges()).basicAdd(otherEnd, msgs);
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetDiagram((Diagram)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -148,8 +196,24 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 		switch (featureID) {
 			case EditorPackage.CONNECTOR__OUTGOING_EDGES:
 				return ((InternalEList<?>)getOutgoingEdges()).basicRemove(otherEnd, msgs);
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				return basicSetDiagram(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID()) {
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				return eInternalContainer().eInverseRemove(this, EditorPackage.DIAGRAM__CONNECTORS, Diagram.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
 
 	/**
@@ -164,6 +228,8 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 				return getOutgoingEdges();
 			case EditorPackage.CONNECTOR__NAME:
 				return getName();
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				return getDiagram();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -184,6 +250,9 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 			case EditorPackage.CONNECTOR__NAME:
 				setName((String)newValue);
 				return;
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				setDiagram((Diagram)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -202,6 +271,9 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 			case EditorPackage.CONNECTOR__NAME:
 				setName(NAME_EDEFAULT);
 				return;
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				setDiagram((Diagram)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -218,6 +290,8 @@ public class ConnectorImpl extends EObjectImpl implements Connector {
 				return outgoingEdges != null && !outgoingEdges.isEmpty();
 			case EditorPackage.CONNECTOR__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case EditorPackage.CONNECTOR__DIAGRAM:
+				return getDiagram() != null;
 		}
 		return super.eIsSet(featureID);
 	}
