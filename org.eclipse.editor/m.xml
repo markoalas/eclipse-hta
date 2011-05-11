@@ -1,32 +1,64 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'>
-<nta>
-	<declaration>// Place global declarations here.
-</declaration>
-	<template>
-		<name x="5" y="5">Template</name>
-		<declaration>// Place local declarations here.
-		</declaration>
-		<location id="id0" x="168" y="-240"></location>
-		<location id="id1" x="16" y="-40">
-			<name x="6" y="-70">name</name>
-			<label kind="invariant" x="6" y="-25">invariant</label>
-			<label kind="comments">comments</label>
-			<urgent />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hta SYSTEM "huppaal-0.6.dtd">
+<hta>
+	<template type="XOR">
+		<name>Template</name>
+		<entry id="Template.ENTRY">
+			<name>ENTRY</name>
+			<connection>
+				<target ref="Template.A.0" />
+			</connection>
+		</entry>
+		<exit id="Template.EXIT6">
+			<name>EXIT</name>
+		</exit>
+		<location id="Template.A.0">
+			<name>A</name>
+			<label kind="invariant" />
 		</location>
-		<init ref="id1" />
+		<location id="Template.B.5">
+			<name>B</name>
+			<label kind="invariant" />
+		</location>
+		<component id="Template.1" instantiates="SD">
+			<name>N2</name>
+		</component>
 		<transition>
-			<source ref="id1" />
-			<target ref="id0" />
-			<label kind="select" x="32" y="-185">select</label>
-			<label kind="guard" x="32" y="-170">guard</label>
-			<label kind="synchronisation" x="32" y="-155">sync</label>
-			<label kind="assignment" x="32" y="-140">update</label>
-			<label kind="comments">comments</label>
+			<source exitref="SD.EXIT4" ref="Template.1" />
+			<target ref="Template.B.5" />
+		</transition>
+		<transition>
+			<source ref="Template.A.0" />
+			<target entryref="SD.ENTRY" ref="Template.1" />
+			<label kind="guard" />
+			<label kind="assignment" />
+			<label kind="synchronisation" />
 		</transition>
 	</template>
-	<system>// Place template instantiations here.
-		Process = Template();
-
-		// List one or more processes to be composed into a system.
-		system Process;</system>
-</nta>
+	<template type="XOR">
+		<name>SD</name>
+		<entry id="SD.ENTRY">
+			<name>ENTRY</name>
+			<connection>
+				<target ref="SD.S.3" />
+			</connection>
+		</entry>
+		<exit id="SD.EXIT4">
+			<name>EXIT</name>
+		</exit>
+		<location id="SD.S.3">
+			<name>S</name>
+			<label kind="invariant" />
+		</location>
+		<transition>
+			<source ref="SD.S.3" />
+			<target ref="SD.EXIT4" />
+			<label kind="guard" />
+			<label kind="assignment" />
+			<label kind="synchronisation" />
+		</transition>
+	</template>
+	<instantiation>template := Template();</instantiation>
+	<system>system template;</system>
+	<globalinit ref="Template.ENTRY" instantiationname="template" />
+</hta>

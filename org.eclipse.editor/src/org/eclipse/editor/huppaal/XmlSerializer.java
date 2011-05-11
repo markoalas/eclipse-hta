@@ -27,6 +27,7 @@ import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.Edge;
 import org.eclipse.editor.editor.State;
 import org.eclipse.editor.huppaal.model.Committed;
+import org.eclipse.editor.huppaal.model.Component;
 import org.eclipse.editor.huppaal.model.Entry;
 import org.eclipse.editor.huppaal.model.Exit;
 import org.eclipse.editor.huppaal.model.Hta;
@@ -68,7 +69,7 @@ public class XmlSerializer {
 		State s = findInitialState(objects);
 
 		Entry entry = createEntry(template, "ENTRY");
-		Object startLocation = generateFor(template, s);
+		GeneratedObject startLocation = generateFor(template, s);
 		entry.getConnection().add(createConnection(startLocation));
 		template.getEntry().add(entry);
 		template.getExit().add(createExit(template, "EXIT"));
@@ -84,13 +85,14 @@ public class XmlSerializer {
 	private Map<String, Location> visitedLocations = Maps.newHashMap();
 	private Map<String, Template> templates = Maps.newHashMap();
 	private Stack<Template> templatesStack = new Stack<Template>(); 
+	private Map<Template, Component> components = Maps.newHashMap();
 	
-	private Object generateFor(Template template, EObject root) {
+	private GeneratedObject generateFor(Template template, EObject root) {
 		if (root instanceof State) {
 			State state = (State) root;
 			String mapKey = template.getName().getvalue() + "." + state.getName();
 			if (visitedLocations.containsKey(mapKey)) {
-				return visitedLocations.get(mapKey);
+				return new GeneratedObject(visitedLocations.get(mapKey));
 			}
 
 			Location location = createLocation(template, state.getName());
@@ -110,7 +112,7 @@ public class XmlSerializer {
 				template.getTransition().add(transition);
 			}
 
-			return location;
+			return new GeneratedObject(location);
 		} else if (root instanceof Connector) {
 			Connector connector = (Connector)root;
 			
@@ -125,7 +127,9 @@ public class XmlSerializer {
 			if (!templateName.equals(template.getName().getvalue())) {
 				templatesStack.push(template);
 				
-				template.getComponent().add(createComponent(template, subTemplate));
+				Component component = createComponent(template, subTemplate);
+				components.put(subTemplate, component);
+				template.getComponent().add(component);
 				
 				Entry entry = createEntry(subTemplate, "ENTRY");
 				subTemplate.getEntry().add(entry);
@@ -134,17 +138,18 @@ public class XmlSerializer {
 					entry.getConnection().add(createConnection(generateFor(subTemplate, e.getEnd())));
 				}
 				
-				return entry;
+				return new GeneratedObject(component, entry);
 			}
 			else {
 				Exit exit = createExit(subTemplate, "EXIT");
 				subTemplate.getExit().add(exit);
 				Template upperTemplate = templatesStack.pop();
+				Component component = components.get(template);
 				for (Edge e : connector.getOutgoingEdges()) {
-					upperTemplate.getTransition().add(createTransition(exit, generateFor(upperTemplate, e.getEnd())));
+					upperTemplate.getTransition().add(createTransition(new GeneratedObject(component, exit), generateFor(upperTemplate, e.getEnd())));
 				}
 				
-				return exit;
+				return new GeneratedObject(exit);
 			}
 		}
 
@@ -152,7 +157,8 @@ public class XmlSerializer {
 	}
 
 	private Transition createTransitionForEdge(Template template, Location location, Edge e) {
-		Transition transition = createTransition(location, generateFor(template, e.getEnd()));
+		GeneratedObject generatedObject = generateFor(template, e.getEnd());
+		Transition transition = createTransition(new GeneratedObject(location), generatedObject);
 		transition.getLabel().add(createLabel("guard", e.getGuard()));
 
 		if (!EditorUtil.isEmpty(e.getSelect())) {
@@ -179,5 +185,37 @@ public class XmlSerializer {
 		}
 
 		return (State) initialStates.iterator().next();
+	}
+	
+	public static class GeneratedObject {
+		private Object object;
+		private Entry entry;
+		private Exit exit;
+		
+		public GeneratedObject(Object object) {
+			this.object = object;
+		}
+		
+		public GeneratedObject(Object obj, Entry entry) {
+			this.object = obj;
+			this.entry = entry;
+		}
+		
+		public GeneratedObject(Object object, Exit exit) {
+			this.object = object;
+			this.exit = exit;
+		}
+
+		public Object getTarget() {
+			return object;
+		}
+
+		public Entry getEntry() {
+			return entry;
+		}
+
+		public Exit getExit() {
+			return exit;
+		}
 	}
 }

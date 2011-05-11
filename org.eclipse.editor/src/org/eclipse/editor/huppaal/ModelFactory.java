@@ -1,5 +1,6 @@
 package org.eclipse.editor.huppaal;
 
+import org.eclipse.editor.huppaal.XmlSerializer.GeneratedObject;
 import org.eclipse.editor.huppaal.model.Component;
 import org.eclipse.editor.huppaal.model.Connection;
 import org.eclipse.editor.huppaal.model.Entry;
@@ -43,23 +44,26 @@ public class ModelFactory {
 		return exit;
 	}
 
-	public static Connection createConnection(Object targetRef) {
+	public static Connection createConnection(GeneratedObject targetRef) {
 		Connection connection = new Connection();
 		Target target = new Target();
-		target.setRef(targetRef);
+		target.setRef(targetRef.getTarget());
+		target.setEntryref(targetRef.getEntry());
 		connection.setTarget(target);
 		return connection;
 	}
 	
-	public static Transition createTransition(Object sourceRef, Object targetRef) {
+	public static Transition createTransition(XmlSerializer.GeneratedObject sourceRef, XmlSerializer.GeneratedObject targetRef) {
 		Transition transition = new Transition();
 		
 		Source source = new Source();
-		source.setRef(sourceRef);
+		source.setRef(sourceRef.getTarget());
+		source.setExitref(sourceRef.getExit());
 		transition.setSource(source);
 		
 		Target target = new Target();
-		target.setRef(targetRef);
+		target.setRef(targetRef.getTarget());
+		target.setEntryref(targetRef.getEntry());
 		transition.setTarget(target);
 		
 		return transition;
