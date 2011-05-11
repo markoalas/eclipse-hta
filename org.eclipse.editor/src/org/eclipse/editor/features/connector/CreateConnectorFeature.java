@@ -7,7 +7,6 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class CreateConnectorFeature extends AbstractCreateFeature {
 
@@ -31,9 +30,7 @@ public class CreateConnectorFeature extends AbstractCreateFeature {
         
         Diagram d = (Diagram)context.getTargetContainer();
         org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram)getAllBusinessObjectsForPictogramElement(d)[0];
-        // subdiagrami objekti ei tehtagi kunagi valmis?
         Connector newConnector = EditorFactory.eINSTANCE.createConnector();
-        //diagram.getConnectors().add(newConnector);
         getDiagram().eResource().getContents().add(newConnector);
         newConnector.setDiagram(diagram);
         newConnector.setName(newConnectorName);

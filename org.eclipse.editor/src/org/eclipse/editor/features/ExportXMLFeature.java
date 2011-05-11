@@ -6,7 +6,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.State;
+import org.eclipse.editor.huppaal.HtaGenerator;
 import org.eclipse.editor.huppaal.XmlSerializer;
+import org.eclipse.editor.huppaal.model.Hta;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -62,8 +64,8 @@ public class ExportXMLFeature extends AbstractCustomFeature {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(fileName);
-			XmlSerializer xmlSerializer = new XmlSerializer();
-			xmlSerializer.toXml(fw, states.toArray(new EObject[states.size()]));
+			Hta hta = new HtaGenerator().generateModel(states.toArray(new EObject[states.size()]));
+			new XmlSerializer().toXml(hta, fw);
 			
 			log.info("Export done");
 		} catch (Exception e) {

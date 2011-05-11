@@ -1,6 +1,6 @@
 package org.eclipse.editor.huppaal;
 
-import org.eclipse.editor.huppaal.XmlSerializer.GeneratedObject;
+import org.eclipse.editor.huppaal.HtaGenerator.GeneratedObject;
 import org.eclipse.editor.huppaal.model.Component;
 import org.eclipse.editor.huppaal.model.Connection;
 import org.eclipse.editor.huppaal.model.Entry;
@@ -62,7 +62,7 @@ public class ModelFactory {
 		return connection;
 	}
 	
-	public static Transition createTransition(XmlSerializer.GeneratedObject sourceRef, XmlSerializer.GeneratedObject targetRef) {
+	public static Transition createTransition(GeneratedObject sourceRef, GeneratedObject targetRef) {
 		Transition transition = new Transition();
 		
 		Source source = new Source();

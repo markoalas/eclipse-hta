@@ -13,7 +13,6 @@ import static org.eclipse.editor.EditorUtil.cast;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
