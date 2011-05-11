@@ -1,7 +1,7 @@
 package org.eclipse.editor.huppaal;
 
 import static org.eclipse.editor.huppaal.ModelFactory.createComponent;
-import static org.eclipse.editor.huppaal.ModelFactory.createConnection;
+import static org.eclipse.editor.huppaal.ModelFactory.createConnectionTo;
 import static org.eclipse.editor.huppaal.ModelFactory.createEntry;
 import static org.eclipse.editor.huppaal.ModelFactory.createExit;
 import static org.eclipse.editor.huppaal.ModelFactory.createGlobalinit;
@@ -57,7 +57,7 @@ public class XmlSerializer {
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.marshal(hta, writer);
 	}
-	
+
 	private Hta hta;
 
 	protected Hta generateModel(EObject... objects) {
@@ -70,7 +70,7 @@ public class XmlSerializer {
 
 		Entry entry = createEntry(template, "ENTRY");
 		GeneratedObject startLocation = generateFor(template, s);
-		entry.getConnection().add(createConnection(startLocation));
+		entry.getConnection().add(createConnectionTo(startLocation));
 		template.getEntry().add(entry);
 		template.getExit().add(createExit(template, "EXIT"));
 
@@ -84,9 +84,9 @@ public class XmlSerializer {
 	// connectorisse tagasi minek annab errori?
 	private Map<String, Location> visitedLocations = Maps.newHashMap();
 	private Map<String, Template> templates = Maps.newHashMap();
-	private Stack<Template> templatesStack = new Stack<Template>(); 
+	private Stack<Template> templatesStack = new Stack<Template>();
 	private Map<Template, Component> components = Maps.newHashMap();
-	
+
 	private GeneratedObject generateFor(Template template, EObject root) {
 		if (root instanceof State) {
 			State state = (State) root;
@@ -108,48 +108,55 @@ public class XmlSerializer {
 			}
 
 			for (Edge e : state.getOutgoingEdges()) {
-				Transition transition = createTransitionForEdge(template, location, e);
-				template.getTransition().add(transition);
+				createTransitionForEdge(template, location, e);
 			}
 
 			return new GeneratedObject(location);
 		} else if (root instanceof Connector) {
-			Connector connector = (Connector)root;
-			
+			Connector connector = (Connector) root;
+
 			String templateName = connector.getDiagram().getName();
 			if (!templates.containsKey(templateName)) {
 				Template t = createTemplate(templateName);
 				templates.put(templateName, t);
 				hta.getTemplate().add(t);
 			}
-			
+
 			Template subTemplate = templates.get(templateName);
 			if (!templateName.equals(template.getName().getvalue())) {
 				templatesStack.push(template);
-				
+
 				Component component = createComponent(template, subTemplate);
 				components.put(subTemplate, component);
 				template.getComponent().add(component);
-				
+
 				Entry entry = createEntry(subTemplate, "ENTRY");
 				subTemplate.getEntry().add(entry);
-			
+
 				for (Edge e : connector.getOutgoingEdges()) {
-					entry.getConnection().add(createConnection(generateFor(subTemplate, e.getEnd())));
+					entry.getConnection().add(createConnectionTo(generateFor(subTemplate, e.getEnd())));
 				}
-				
+
 				return new GeneratedObject(component, entry);
-			}
-			else {
-				Exit exit = createExit(subTemplate, "EXIT");
+			} else {
+				final Exit exit = createExit(subTemplate, "EXIT");
 				subTemplate.getExit().add(exit);
 				Template upperTemplate = templatesStack.pop();
 				Component component = components.get(template);
 				for (Edge e : connector.getOutgoingEdges()) {
-					upperTemplate.getTransition().add(createTransition(new GeneratedObject(component, exit), generateFor(upperTemplate, e.getEnd())));
+					GeneratedObject gen = generateFor(upperTemplate, e.getEnd());
+					gen.connectionFrom(new GeneratedObject(component, exit), upperTemplate);
 				}
-				
-				return new GeneratedObject(exit);
+
+				// v2line func teeb siia nyyd transitioni, aga peaks tegema
+				// hoopis exitile connectioni
+				return new GeneratedObject(exit) {
+					@Override
+					public Transition connectionFrom(GeneratedObject o, Template t) {
+						exit.getConnection().add(ModelFactory.createConnectionFrom(o));
+						return null;
+					}
+				};
 			}
 		}
 
@@ -158,17 +165,21 @@ public class XmlSerializer {
 
 	private Transition createTransitionForEdge(Template template, Location location, Edge e) {
 		GeneratedObject generatedObject = generateFor(template, e.getEnd());
-		Transition transition = createTransition(new GeneratedObject(location), generatedObject);
-		transition.getLabel().add(createLabel("guard", e.getGuard()));
+		Transition transition = generatedObject.connectionFrom(new GeneratedObject(location), template);
+		// createTransition(new GeneratedObject(location), generatedObject);
+		if (transition != null) {
+			transition.getLabel().add(createLabel("guard", e.getGuard()));
 
-		if (!EditorUtil.isEmpty(e.getSelect())) {
-			transition.getLabel().add(createLabel("select", e.getSelect()));
+			if (!EditorUtil.isEmpty(e.getSelect())) {
+				transition.getLabel().add(createLabel("select", e.getSelect()));
+			}
+			transition.getLabel().add(createLabel("assignment", e.getUpdate()));
+			transition.getLabel().add(createLabel("synchronisation", e.getSync()));
+			if (!EditorUtil.isEmpty(e.getComments())) {
+				transition.getLabel().add(createLabel("comments", e.getComments()));
+			}
 		}
-		transition.getLabel().add(createLabel("assignment", e.getUpdate()));
-		transition.getLabel().add(createLabel("synchronisation", e.getSync()));
-		if (!EditorUtil.isEmpty(e.getComments())) {
-			transition.getLabel().add(createLabel("comments", e.getComments()));
-		}
+		
 		return transition;
 	}
 
@@ -186,21 +197,21 @@ public class XmlSerializer {
 
 		return (State) initialStates.iterator().next();
 	}
-	
+
 	public static class GeneratedObject {
 		private Object object;
 		private Entry entry;
 		private Exit exit;
-		
+
 		public GeneratedObject(Object object) {
 			this.object = object;
 		}
-		
+
 		public GeneratedObject(Object obj, Entry entry) {
 			this.object = obj;
 			this.entry = entry;
 		}
-		
+
 		public GeneratedObject(Object object, Exit exit) {
 			this.object = object;
 			this.exit = exit;
@@ -216,6 +227,12 @@ public class XmlSerializer {
 
 		public Exit getExit() {
 			return exit;
+		}
+
+		public Transition connectionFrom(GeneratedObject o, Template t) {
+			Transition transition = createTransition(o, GeneratedObject.this);
+			t.getTransition().add(transition);
+			return transition;
 		}
 	}
 }

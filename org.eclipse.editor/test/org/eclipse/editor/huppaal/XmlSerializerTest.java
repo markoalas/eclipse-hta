@@ -227,9 +227,9 @@ public class XmlSerializerTest {
 		assertTransition(transitions, template.getComponent().get(0), subTemplate.getExit().get(0), locations.get(1), null);
 
 		assertLocations(subLocations, Arrays.asList("C"));
-		assertEquals(1, subTransitions.size());
-		assertTransition(subTransitions, subLocations.get(0), subTemplate.getExit().get(0));
+		assertEquals(0, subTransitions.size());
 		assertEquals(subTemplate.getLocation().get(0), subTemplate.getEntry().get(0).getConnection().get(0).getTarget().getRef());
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getExit().get(0).getConnection().get(0).getSource().getRef());
 	}
 
 	private Label findByKind(Iterable<Label> labels, final String kind) {

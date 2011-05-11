@@ -44,12 +44,21 @@ public class ModelFactory {
 		return exit;
 	}
 
-	public static Connection createConnection(GeneratedObject targetRef) {
+	public static Connection createConnectionTo(GeneratedObject targetRef) {
 		Connection connection = new Connection();
 		Target target = new Target();
 		target.setRef(targetRef.getTarget());
 		target.setEntryref(targetRef.getEntry());
 		connection.setTarget(target);
+		return connection;
+	}
+
+	public static Connection createConnectionFrom(GeneratedObject sourceRef) {
+		Connection connection = new Connection();
+		Source source = new Source();
+		source.setRef(sourceRef.getTarget());
+		source.setExitref(sourceRef.getExit());
+		connection.setSource(source);
 		return connection;
 	}
 	
