@@ -111,7 +111,6 @@ public class XmlSerializer {
 			}
 
 			Location location = createLocation(template, state.getName());
-			System.out.println("Adding location " + location.getName().getvalue() + " to " + template.getName().getvalue());
 			template.getLocation().add(location);
 
 			GeneratedObject ret = new GeneratedObject(location);
@@ -125,9 +124,7 @@ public class XmlSerializer {
 				location.setCommitted(new Committed());
 			}
 
-			System.out.println(location.getName().getvalue() + ": outgoing " + state.getOutgoingEdges().size());
 			for (Edge e : state.getOutgoingEdges()) {
-				System.out.println("  -> " + e.getEnd());
 				createTransitionForEdge(templates, location, e);
 			}
 
@@ -139,7 +136,6 @@ public class XmlSerializer {
 			Template subTemplate = getCachedTemplate(templateName);
 
 			String mapKey = "connector." + subTemplate.getName().getvalue() + "." + connector.getName();
-			System.out.println("GET: " + mapKey);
 			if (visitedLocations.containsKey(mapKey)) {
 				return visitedLocations.get(mapKey);
 			}
@@ -152,13 +148,10 @@ public class XmlSerializer {
 				subTemplate.getEntry().add(entry);
 
 				GeneratedObject ret = new GeneratedObject(component, entry);
-				System.out.println("PUT: " + mapKey);
 				visitedLocations.put(mapKey, ret);
 
-				System.out.println(connector.getName() + ": outgoing " + connector.getOutgoingEdges().size());
 				templates.push(subTemplate);
 				for (Edge e : connector.getOutgoingEdges()) {
-					System.out.println("  -> " + e.getEnd());
 					entry.getConnection().add(createConnectionTo(generateFor(templates, e.getEnd())));
 				}
 
@@ -177,13 +170,10 @@ public class XmlSerializer {
 						return null;
 					}
 				};
-				System.out.println("PUT: " + mapKey);
 				visitedLocations.put(mapKey, ret);
 
-				System.out.println(connector.getName() + ": outgoing " + connector.getOutgoingEdges().size());
 				Template currentTemplate = templates.pop();
 				for (Edge e : connector.getOutgoingEdges()) {
-					System.out.println("  -> " + e.getEnd());
 					GeneratedObject gen = generateFor(templates, e.getEnd());
 					gen.connectionFrom(new GeneratedObject(component, exit), templates.peek());
 				}
@@ -220,7 +210,6 @@ public class XmlSerializer {
 
 	private Transition createTransitionForEdge(Stack<Template> templates, Location location, Edge edge) {
 		GeneratedObject generatedObject = generateFor(templates, edge.getEnd());
-		System.out.println(generatedObject.getTarget() + "/" + generatedObject.getEntry());
 		Transition transition = generatedObject.connectionFrom(new GeneratedObject(location), templates.peek());
 
 		if (transition != null) {
