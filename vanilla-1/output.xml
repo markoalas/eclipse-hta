@@ -5,13 +5,13 @@
 
 <nta>
   <!-- TRANSLATED by   Flatten   Vanilla-1 Mon Apr  9 14:28:08 2001
-	          on   May 11, 2011 4:09:11 PM
+	          on   May 11, 2011 7:57:55 PM
 	          from a huppaal-0.6.dtd document -->
   <!--
         Tree of Instantiations:
         ROOT1 [AND]
             template2 [XOR]
-                template2N93 [XOR]
+                template2N263 [XOR]
 -->
   <declaration>
 
@@ -19,8 +19,10 @@
 chan  xtSglNR2;
 chan  TmpltENTRYtrtmplt2;
 chan  xtSglNR3;
-chan  SDENTRYtrtmplt2N93;
+chan  SDENTRYtrtmplt2N263;
+chan  SDENTRYtrtmplt2N263;
 int  triggerVar1;
+int  triggerVar2;
 </declaration>
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <template>
@@ -43,11 +45,11 @@ int  triggerVar1;
   <!-- ****** END OF TEMPLATE "globalKickoff4"  -->
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <template>
-    <name x="0" y="0">template2N93</name>
+    <name x="0" y="0">template2N263</name>
     <parameter x="600" y="0" />
     <declaration />
     <!--ordinary locations-->
-    <location x="40" y="40" id="template2N93SD.S.10">
+    <location x="40" y="40" id="template2N263SD.S.27">
       <name x="60" y="20">S</name>
       <invariant x="60" y="60"></invariant>
     </location>
@@ -60,37 +62,49 @@ int  triggerVar1;
     <init ref="X_ID_7" />
     <transition x="190" y="30">
       <source ref="X_ID_7" />
-      <target ref="template2N93SD.S.10" />
-      <label kind="synchronisation" x="215" y="39">SDENTRYtrtmplt2N93?</label>
-      <label kind="assignment" x="120" y="40">triggerVar1 := triggerVar1 + 1 </label>
+      <target ref="template2N263SD.S.27" />
+      <label kind="synchronisation" x="215" y="39">SDENTRYtrtmplt2N263?</label>
+      <label kind="assignment" x="120" y="40">triggerVar1 := triggerVar1 + 1 , triggerVar2 := triggerVar2 + 1 </label>
+    </transition>
+    <transition x="190" y="30">
+      <source ref="X_ID_7" />
+      <target ref="template2N263SD.S.27" />
+      <label kind="synchronisation" x="215" y="39">SDENTRYtrtmplt2N263?</label>
+      <label kind="assignment" x="120" y="40">triggerVar1 := triggerVar1 + 1 , triggerVar2 := triggerVar2 + 1 </label>
     </transition>
     <!--ordinary transitions-->
     <!--exit transitions-->
     <transition x="190" y="30">
-      <source ref="template2N93SD.S.10" />
+      <source ref="template2N263SD.S.27" />
       <target ref="X_ID_7" />
       <label kind="synchronisation" x="185" y="41">xtSglNR3?</label>
-      <label kind="assignment" x="270" y="30">triggerVar1 := triggerVar1 - 1 </label>
+      <label kind="assignment" x="270" y="30">triggerVar1 := triggerVar1 - 1 , triggerVar2 := triggerVar2 - 1 </label>
+    </transition>
+    <transition x="190" y="30">
+      <source ref="template2N263SD.S.27" />
+      <target ref="X_ID_7" />
+      <label kind="synchronisation" x="185" y="41">xtSglNR3?</label>
+      <label kind="assignment" x="270" y="30">triggerVar1 := triggerVar1 - 1 , triggerVar2 := triggerVar2 - 1 </label>
     </transition>
   </template>
-  <!-- ****** END OF TEMPLATE "template2N93"  -->
+  <!-- ****** END OF TEMPLATE "template2N263"  -->
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <template>
     <name x="0" y="0">template2</name>
     <parameter x="600" y="0" />
     <declaration />
     <!--ordinary locations-->
-    <location x="40" y="40" id="template2Template.A.7">
+    <location x="40" y="40" id="template2Template.A.24">
       <name x="60" y="20">A</name>
       <invariant x="60" y="60"></invariant>
     </location>
-    <location x="340" y="20" id="template2Template.B.12">
+    <location x="340" y="20" id="template2Template.B.29">
       <name x="360" y="0">B</name>
       <invariant x="360" y="40"></invariant>
     </location>
     <!--now the (former) components-->
     <location x="20" y="340" id="X_ID_3">
-      <name x="40" y="320">N9</name>
+      <name x="40" y="320">N26</name>
     </location>
     <location x="640" y="120" id="X_ID_4">
       <name x="660" y="100">L1</name>
@@ -103,23 +117,37 @@ int  triggerVar1;
       <name x="140" y="620">L3</name>
       <committed />
     </location>
+    <location x="940" y="-140" id="X_ID_11">
+      <name x="960" y="-160">L4</name>
+      <committed />
+    </location>
     <init ref="X_ID_5" />
     <transition x="330" y="230">
       <source ref="X_ID_4" />
       <target ref="X_ID_3" />
-      <label kind="synchronisation" x="371" y="229">SDENTRYtrtmplt2N93!</label>
+      <label kind="synchronisation" x="371" y="229">SDENTRYtrtmplt2N263!</label>
+    </transition>
+    <transition x="330" y="230">
+      <source ref="X_ID_4" />
+      <target ref="X_ID_3" />
+      <label kind="synchronisation" x="371" y="229">SDENTRYtrtmplt2N263!</label>
     </transition>
     <!--special location: idle-->
     <!--entry pseudo-transitions (OR component)-->
     <transition x="180" y="180">
       <source ref="X_ID_5" />
-      <target ref="template2Template.A.7" />
+      <target ref="template2Template.A.24" />
       <label kind="synchronisation" x="204" y="204">TmpltENTRYtrtmplt2?</label>
     </transition>
     <!--ordinary transitions-->
-    <!--entry of sub-component [N9]-->
+    <!--entry of sub-component [N26]-->
     <transition x="340" y="80">
-      <source ref="template2Template.A.7" />
+      <source ref="template2Template.A.24" />
+      <target ref="X_ID_4" />
+    </transition>
+    <!--entry of sub-component [N26]-->
+    <transition x="340" y="80">
+      <source ref="template2Template.A.24" />
       <target ref="X_ID_4" />
     </transition>
     <!--exit transitions-->
@@ -132,15 +160,27 @@ int  triggerVar1;
     </transition>
     <transition x="230" y="330">
       <source ref="X_ID_10" />
-      <target ref="template2Template.B.12" />
+      <target ref="template2Template.B.29" />
       <label kind="synchronisation" x="229" y="371">xtSglNR3!</label>
+    </transition>
+    <!--inserting next global join [1 root transitions]-->
+    <transition x="480" y="100">
+      <source ref="X_ID_3" />
+      <target ref="X_ID_11" />
+      <!--STRANGE: no sync found in root transition of global join-->
+      <label kind="guard" x="153" y="263">triggerVar2 == 1</label>
+    </transition>
+    <transition x="640" y="-60">
+      <source ref="X_ID_11" />
+      <target ref="template2Template.B.29" />
+      <label kind="synchronisation" x="680" y="-58">xtSglNR3!</label>
     </transition>
   </template>
   <!-- ****** END OF TEMPLATE "template2"  -->
   <instantiation>template2 := template2();
-template2N93 := template2N93();
+template2N263 := template2N263();
 globalKickoff4 := globalKickoff4();</instantiation>
-  <system>system template2, template2N93, globalKickoff4;
+  <system>system template2, template2N263, globalKickoff4;
 </system>
 </nta>
 

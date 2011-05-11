@@ -141,6 +141,26 @@ public class XmlSerializerTest {
 		assertTransition(transitions, locations.get(0), locations.get(1));
 		assertTransition(transitions, locations.get(1), locations.get(0));
 	}
+	
+	@Test
+	public void cyclicWithConnectors() throws Exception {
+		State stateA = createInitialState("A");
+		State stateB = createState("B");
+		Diagram subDiagram = createDiagram("sub");
+		Connector connector = createConnector(subDiagram, "C");
+		Connector connector2 = createConnector(subDiagram, "D");
+		createEdge(stateA, connector);
+		createEdge(connector, connector2);
+		createEdge(connector2, stateB);
+		createEdge(stateB, connector);
+		
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		Template template = hta.getTemplate().get(0);
+		
+		assertEquals(2, hta.getTemplate().size());
+		assertEquals(3, template.getTransition().size());
+		assertEquals(1, hta.getTemplate().get(1).getEntry().size());
+	}
 
 	@Test
 	public void transitionProperties_EverythingIsSet() throws Exception {
@@ -214,7 +234,9 @@ public class XmlSerializerTest {
 		List<Location> subLocations = subTemplate.getLocation();
 		List<Transition> subTransitions = subTemplate.getTransition();
 
-		Component component = template.getComponent().get(0);
+		List<Component> components = template.getComponent();
+		Component component = components.get(0);
+		assertEquals(1, components.size());
 		assertEquals(subTemplate.getName().getvalue(), component.getInstantiates());
 		assertTrue(component.getId().matches("Template.\\d+"));
 
@@ -223,13 +245,76 @@ public class XmlSerializerTest {
 		assertLocations(locations, Arrays.asList("A", "B"));
 
 		assertEquals(2, transitions.size());
-		assertTransition(transitions, locations.get(0), null, template.getComponent().get(0), subTemplate.getEntry().get(0));
-		assertTransition(transitions, template.getComponent().get(0), subTemplate.getExit().get(0), locations.get(1), null);
+		assertTransition(transitions, locations.get(0), null, components.get(0), subTemplate.getEntry().get(0));
+		assertTransition(transitions, components.get(0), subTemplate.getExit().get(0), locations.get(1), null);
 
 		assertLocations(subLocations, Arrays.asList("C"));
 		assertEquals(0, subTransitions.size());
 		assertEquals(subTemplate.getLocation().get(0), subTemplate.getEntry().get(0).getConnection().get(0).getTarget().getRef());
 		assertEquals(subTemplate.getLocation().get(0), subTemplate.getExit().get(0).getConnection().get(0).getSource().getRef());
+	}
+	
+	@Test
+	public void subDiagramWithMultipleEntriesAndExits() throws Exception {
+		/*
+		 *   / C1 - C2 \
+		 * A             B
+		 *   \ C3 - C4 /
+ 		 */
+		State stateA = createInitialState("A");
+		Diagram subDiagram = createDiagram("sub");
+		Connector connector1 = createConnector(subDiagram, "con1");
+		Connector connector2 = createConnector(subDiagram, "con2");
+		Connector connector3 = createConnector(subDiagram, "con3");
+		Connector connector4 = createConnector(subDiagram, "con4");
+
+		State stateB = createState("B");
+		State stateC = createState("C");
+
+		createEdge(stateA, connector1);
+		createEdge(connector1, stateC);
+		createEdge(stateC, connector2);
+		createEdge(connector2, stateB);
+		
+		createEdge(stateA, connector3);
+		createEdge(connector3, stateC);
+		createEdge(stateC, connector4);
+		createEdge(connector4, stateB);
+		
+		Hta hta = xmlSerializer.generateModel(stateA, stateB);
+		List<Template> templates = hta.getTemplate();
+		assertEquals(2, templates.size());
+
+		Template template = templates.get(0);
+		List<Location> locations = template.getLocation();
+		List<Transition> transitions = template.getTransition();
+
+		Template subTemplate = templates.get(1);
+		List<Location> subLocations = subTemplate.getLocation();
+		List<Transition> subTransitions = subTemplate.getTransition();
+
+		List<Component> components = template.getComponent();
+		assertEquals(1, components.size());
+		Component component = components.get(0);
+		assertEquals(subTemplate.getName().getvalue(), component.getInstantiates());
+		assertTrue(component.getId().matches("Template.\\d+"));
+
+		assertEquals(2, subTemplate.getEntry().size());
+		assertEquals(2, subTemplate.getExit().size());
+		assertLocations(locations, Arrays.asList("A", "B"));
+
+		assertEquals(4, transitions.size());
+		assertTransition(transitions, locations.get(0), null, template.getComponent().get(0), subTemplate.getEntry().get(0));
+		assertTransition(transitions, template.getComponent().get(0), subTemplate.getExit().get(0), locations.get(1), null);
+		assertTransition(transitions, locations.get(0), null, template.getComponent().get(0), subTemplate.getEntry().get(1));
+		assertTransition(transitions, template.getComponent().get(0), subTemplate.getExit().get(1), locations.get(1), null);
+
+		assertLocations(subLocations, Arrays.asList("C"));
+		assertEquals(0, subTransitions.size());
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getEntry().get(0).getConnection().get(0).getTarget().getRef());
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getExit().get(0).getConnection().get(0).getSource().getRef());
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getEntry().get(1).getConnection().get(0).getTarget().getRef());
+		assertEquals(subTemplate.getLocation().get(0), subTemplate.getExit().get(1).getConnection().get(0).getSource().getRef());
 	}
 
 	private Label findByKind(Iterable<Label> labels, final String kind) {

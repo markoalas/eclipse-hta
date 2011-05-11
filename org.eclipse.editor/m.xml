@@ -6,30 +6,41 @@
 		<entry id="Template.ENTRY">
 			<name>ENTRY</name>
 			<connection>
-				<target ref="Template.A.7" />
+				<target ref="Template.A.24" />
 			</connection>
 		</entry>
-		<exit id="Template.EXIT13">
+		<exit id="Template.EXIT31">
 			<name>EXIT</name>
 		</exit>
-		<location id="Template.A.7">
+		<location id="Template.A.24">
 			<name>A</name>
 			<label kind="invariant" />
 		</location>
-		<location id="Template.B.12">
+		<location id="Template.B.29">
 			<name>B</name>
 			<label kind="invariant" />
 		</location>
-		<component id="Template.8" instantiates="SD">
-			<name>N9</name>
+		<component id="Template.25" instantiates="SD">
+			<name>N26</name>
 		</component>
 		<transition>
-			<source exitref="SD.EXIT11" ref="Template.8" />
-			<target ref="Template.B.12" />
+			<source exitref="SD.EXIT28" ref="Template.25" />
+			<target ref="Template.B.29" />
 		</transition>
 		<transition>
-			<source ref="Template.A.7" />
-			<target entryref="SD.ENTRY" ref="Template.8" />
+			<source exitref="SD.EXIT30" ref="Template.25" />
+			<target ref="Template.B.29" />
+		</transition>
+		<transition>
+			<source ref="Template.A.24" />
+			<target entryref="SD.ENTRY" ref="Template.25" />
+			<label kind="guard" />
+			<label kind="assignment" />
+			<label kind="synchronisation" />
+		</transition>
+		<transition>
+			<source ref="Template.A.24" />
+			<target entryref="SD.ENTRY" ref="Template.25" />
 			<label kind="guard" />
 			<label kind="assignment" />
 			<label kind="synchronisation" />
@@ -40,16 +51,28 @@
 		<entry id="SD.ENTRY">
 			<name>ENTRY</name>
 			<connection>
-				<target ref="SD.S.10" />
+				<target ref="SD.S.27" />
 			</connection>
 		</entry>
-		<exit id="SD.EXIT11">
+		<entry id="SD.ENTRY">
+			<name>ENTRY</name>
+			<connection>
+				<target ref="SD.S.27" />
+			</connection>
+		</entry>
+		<exit id="SD.EXIT28">
 			<name>EXIT</name>
 			<connection>
-				<source ref="SD.S.10" />
+				<source ref="SD.S.27" />
 			</connection>
 		</exit>
-		<location id="SD.S.10">
+		<exit id="SD.EXIT30">
+			<name>EXIT</name>
+			<connection>
+				<source ref="SD.S.27" />
+			</connection>
+		</exit>
+		<location id="SD.S.27">
 			<name>S</name>
 			<label kind="invariant" />
 		</location>

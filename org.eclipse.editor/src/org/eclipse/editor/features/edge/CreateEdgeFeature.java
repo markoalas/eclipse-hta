@@ -39,7 +39,6 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 		Connection newConnection = null;
 
 		Edge edge = EditorFactory.eINSTANCE.createEdge();
-		// getEndPoint annab diagrammi, meil on vaja connector sealt seest otsida.
 		edge.setStart(getEndPoint(context.getSourceAnchor()));
 		edge.setEnd(getEndPoint(context.getTargetAnchor()));
 		getDiagram().eResource().getContents().add(edge);

@@ -1,6 +1,7 @@
 package org.eclipse.editor.huppaal;
 
 import static org.eclipse.editor.huppaal.ModelFactory.createComponent;
+import static org.eclipse.editor.huppaal.ModelFactory.createConnectionFrom;
 import static org.eclipse.editor.huppaal.ModelFactory.createConnectionTo;
 import static org.eclipse.editor.huppaal.ModelFactory.createEntry;
 import static org.eclipse.editor.huppaal.ModelFactory.createExit;
@@ -14,9 +15,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -69,7 +70,9 @@ public class XmlSerializer {
 		State s = findInitialState(objects);
 
 		Entry entry = createEntry(template, "ENTRY");
-		GeneratedObject startLocation = generateFor(template, s);
+		Stack<Template> templateStack = new Stack<Template>();
+		templateStack.push(template);
+		GeneratedObject startLocation = generateFor(templateStack, s);
 		entry.getConnection().add(createConnectionTo(startLocation));
 		template.getEntry().add(entry);
 		template.getExit().add(createExit(template, "EXIT"));
@@ -81,23 +84,38 @@ public class XmlSerializer {
 		return hta;
 	}
 
-	// connectorisse tagasi minek annab errori?
-	private Map<String, Location> visitedLocations = Maps.newHashMap();
+	private Map<String, GeneratedObject> visitedLocations = Maps.newHashMap();
 	private Map<String, Template> templates = Maps.newHashMap();
-	private Stack<Template> templatesStack = new Stack<Template>();
 	private Map<Template, Component> components = Maps.newHashMap();
 
-	private GeneratedObject generateFor(Template template, EObject root) {
+	private <T> T peek(List<T> list) {
+		return get(list, 0);
+	}
+	
+	private <T> T get(List<T> list, int indexFromEnd) {
+		try {
+			return list.get(list.size() - 1 - indexFromEnd);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private GeneratedObject generateFor(Stack<Template> templates, EObject root) {
+		Template template = peek(templates);
+
 		if (root instanceof State) {
 			State state = (State) root;
-			String mapKey = template.getName().getvalue() + "." + state.getName();
+			String mapKey = "state." + template.getName().getvalue() + "." + state.getName();
 			if (visitedLocations.containsKey(mapKey)) {
-				return new GeneratedObject(visitedLocations.get(mapKey));
+				return visitedLocations.get(mapKey);
 			}
 
 			Location location = createLocation(template, state.getName());
+			System.out.println("Adding location " + location.getName().getvalue() + " to " + template.getName().getvalue());
 			template.getLocation().add(location);
-			visitedLocations.put(mapKey, location);
+
+			GeneratedObject ret = new GeneratedObject(location);
+			visitedLocations.put(mapKey, ret);
 
 			location.getLabel().add(createLabel("invariant", state.getInvariant()));
 			if (state.isUrgent()) {
@@ -107,79 +125,117 @@ public class XmlSerializer {
 				location.setCommitted(new Committed());
 			}
 
+			System.out.println(location.getName().getvalue() + ": outgoing " + state.getOutgoingEdges().size());
 			for (Edge e : state.getOutgoingEdges()) {
-				createTransitionForEdge(template, location, e);
+				System.out.println("  -> " + e.getEnd());
+				createTransitionForEdge(templates, location, e);
 			}
 
-			return new GeneratedObject(location);
+			return ret;
+
 		} else if (root instanceof Connector) {
 			Connector connector = (Connector) root;
-
 			String templateName = connector.getDiagram().getName();
-			if (!templates.containsKey(templateName)) {
-				Template t = createTemplate(templateName);
-				templates.put(templateName, t);
-				hta.getTemplate().add(t);
+			Template subTemplate = getCachedTemplate(templateName);
+
+			String mapKey = "connector." + subTemplate.getName().getvalue() + "." + connector.getName();
+			System.out.println("GET: " + mapKey);
+			if (visitedLocations.containsKey(mapKey)) {
+				return visitedLocations.get(mapKey);
 			}
 
-			Template subTemplate = templates.get(templateName);
-			if (!templateName.equals(template.getName().getvalue())) {
-				templatesStack.push(template);
-
-				Component component = createComponent(template, subTemplate);
-				components.put(subTemplate, component);
-				template.getComponent().add(component);
-
+			if (!templateName.equals(template.getName().getvalue())) { // ENTRY
+				
+				Component component = getCachedComponent(template, subTemplate);
+				
 				Entry entry = createEntry(subTemplate, "ENTRY");
 				subTemplate.getEntry().add(entry);
 
+				GeneratedObject ret = new GeneratedObject(component, entry);
+				System.out.println("PUT: " + mapKey);
+				visitedLocations.put(mapKey, ret);
+
+				System.out.println(connector.getName() + ": outgoing " + connector.getOutgoingEdges().size());
+				templates.push(subTemplate);
 				for (Edge e : connector.getOutgoingEdges()) {
-					entry.getConnection().add(createConnectionTo(generateFor(subTemplate, e.getEnd())));
+					System.out.println("  -> " + e.getEnd());
+					entry.getConnection().add(createConnectionTo(generateFor(templates, e.getEnd())));
 				}
 
-				return new GeneratedObject(component, entry);
-			} else {
+				templates.pop();
+				return ret;
+
+			} else { // EXIT
 				final Exit exit = createExit(subTemplate, "EXIT");
 				subTemplate.getExit().add(exit);
-				Template upperTemplate = templatesStack.pop();
-				Component component = components.get(template);
-				for (Edge e : connector.getOutgoingEdges()) {
-					GeneratedObject gen = generateFor(upperTemplate, e.getEnd());
-					gen.connectionFrom(new GeneratedObject(component, exit), upperTemplate);
-				}
+				final Component component = components.get(template);
 
-				// v2line func teeb siia nyyd transitioni, aga peaks tegema
-				// hoopis exitile connectioni
-				return new GeneratedObject(exit) {
+				GeneratedObject ret = new GeneratedObject(exit) {
 					@Override
 					public Transition connectionFrom(GeneratedObject o, Template t) {
-						exit.getConnection().add(ModelFactory.createConnectionFrom(o));
+						exit.getConnection().add(createConnectionFrom(o));
 						return null;
 					}
 				};
+				System.out.println("PUT: " + mapKey);
+				visitedLocations.put(mapKey, ret);
+
+				System.out.println(connector.getName() + ": outgoing " + connector.getOutgoingEdges().size());
+				Template currentTemplate = templates.pop();
+				for (Edge e : connector.getOutgoingEdges()) {
+					System.out.println("  -> " + e.getEnd());
+					GeneratedObject gen = generateFor(templates, e.getEnd());
+					gen.connectionFrom(new GeneratedObject(component, exit), templates.peek());
+				}
+
+				templates.push(currentTemplate);
+				return ret;
 			}
 		}
 
 		throw new IllegalArgumentException("Unknown EObject type: " + root.getClass().getSimpleName());
 	}
 
-	private Transition createTransitionForEdge(Template template, Location location, Edge e) {
-		GeneratedObject generatedObject = generateFor(template, e.getEnd());
-		Transition transition = generatedObject.connectionFrom(new GeneratedObject(location), template);
-		// createTransition(new GeneratedObject(location), generatedObject);
-		if (transition != null) {
-			transition.getLabel().add(createLabel("guard", e.getGuard()));
-
-			if (!EditorUtil.isEmpty(e.getSelect())) {
-				transition.getLabel().add(createLabel("select", e.getSelect()));
-			}
-			transition.getLabel().add(createLabel("assignment", e.getUpdate()));
-			transition.getLabel().add(createLabel("synchronisation", e.getSync()));
-			if (!EditorUtil.isEmpty(e.getComments())) {
-				transition.getLabel().add(createLabel("comments", e.getComments()));
-			}
+	private Component getCachedComponent(Template template, Template subTemplate) {
+		if (!components.containsKey(subTemplate)) {
+			Component component = createComponent(template, subTemplate);
+			template.getComponent().add(component);
+			components.put(subTemplate, component);
 		}
 		
+		Component component = components.get(subTemplate);
+		return component;
+	}
+
+	private Template getCachedTemplate(String templateName) {
+		if (!templates.containsKey(templateName)) {
+			Template t = createTemplate(templateName);
+			templates.put(templateName, t);
+			hta.getTemplate().add(t);
+		}
+
+		Template subTemplate = templates.get(templateName);
+		return subTemplate;
+	}
+
+	private Transition createTransitionForEdge(Stack<Template> templates, Location location, Edge edge) {
+		GeneratedObject generatedObject = generateFor(templates, edge.getEnd());
+		System.out.println(generatedObject.getTarget() + "/" + generatedObject.getEntry());
+		Transition transition = generatedObject.connectionFrom(new GeneratedObject(location), templates.peek());
+
+		if (transition != null) {
+			transition.getLabel().add(createLabel("guard", edge.getGuard()));
+
+			if (!EditorUtil.isEmpty(edge.getSelect())) {
+				transition.getLabel().add(createLabel("select", edge.getSelect()));
+			}
+			transition.getLabel().add(createLabel("assignment", edge.getUpdate()));
+			transition.getLabel().add(createLabel("synchronisation", edge.getSync()));
+			if (!EditorUtil.isEmpty(edge.getComments())) {
+				transition.getLabel().add(createLabel("comments", edge.getComments()));
+			}
+		}
+
 		return transition;
 	}
 
