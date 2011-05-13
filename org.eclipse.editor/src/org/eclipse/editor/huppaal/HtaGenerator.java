@@ -246,7 +246,7 @@ public class HtaGenerator {
 		}
 
 		public Transition connectionFrom(GeneratedObject o, Template t) {
-			Transition transition = createTransition(o, GeneratedObject.this);
+			Transition transition = createTransition(o, this);
 			t.getTransition().add(transition);
 			return transition;
 		}
