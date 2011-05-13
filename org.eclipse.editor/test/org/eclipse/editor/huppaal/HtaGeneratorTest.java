@@ -250,9 +250,9 @@ public class HtaGeneratorTest {
 	@Test
 	public void subDiagramWithMultipleEntriesAndExits() throws Exception {
 		/*
-		 *   / C1 - C2 \
-		 * A             B
-		 *   \ C3 - C4 /
+		 *  / C1 \ / C2 \
+		 * A      C      B
+		 *  \ C3 / \ C4 /
  		 */
 		State stateA = createInitialState("A");
 		Diagram subDiagram = createDiagram("sub");
