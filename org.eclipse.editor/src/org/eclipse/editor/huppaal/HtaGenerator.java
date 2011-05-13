@@ -114,7 +114,7 @@ public class HtaGenerator {
 			return visitedLocations.get(mapKey);
 		}
 
-		if (!templateName.equals(template.getName().getvalue())) { // ENTRY
+		if (!subTemplate.equals(template)) { // ENTRY
 			
 			Component component = getCachedComponent(template, subTemplate);
 			
