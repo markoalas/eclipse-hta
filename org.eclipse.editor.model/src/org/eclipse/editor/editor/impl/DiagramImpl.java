@@ -42,6 +42,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getStates <em>States</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getSubdiagrams <em>Subdiagrams</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#getEdges <em>Edges</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.impl.DiagramImpl#isIsParallel <em>Is Parallel</em>}</li>
  * </ul>
  * </p>
  *
@@ -107,6 +108,26 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 * @ordered
 	 */
 	protected EList<Edge> edges;
+
+	/**
+	 * The default value of the '{@link #isIsParallel() <em>Is Parallel</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isIsParallel()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean IS_PARALLEL_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isIsParallel() <em>Is Parallel</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isIsParallel()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean isParallel = IS_PARALLEL_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -201,6 +222,27 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public boolean isIsParallel() {
+		return isParallel;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setIsParallel(boolean newIsParallel) {
+		boolean oldIsParallel = isParallel;
+		isParallel = newIsParallel;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, EditorPackage.DIAGRAM__IS_PARALLEL, oldIsParallel, isParallel));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
@@ -249,6 +291,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				return getSubdiagrams();
 			case EditorPackage.DIAGRAM__EDGES:
 				return getEdges();
+			case EditorPackage.DIAGRAM__IS_PARALLEL:
+				return isIsParallel();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -281,6 +325,9 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				getEdges().clear();
 				getEdges().addAll((Collection<? extends Edge>)newValue);
 				return;
+			case EditorPackage.DIAGRAM__IS_PARALLEL:
+				setIsParallel((Boolean)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -308,6 +355,9 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 			case EditorPackage.DIAGRAM__EDGES:
 				getEdges().clear();
 				return;
+			case EditorPackage.DIAGRAM__IS_PARALLEL:
+				setIsParallel(IS_PARALLEL_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -330,6 +380,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 				return subdiagrams != null && !subdiagrams.isEmpty();
 			case EditorPackage.DIAGRAM__EDGES:
 				return edges != null && !edges.isEmpty();
+			case EditorPackage.DIAGRAM__IS_PARALLEL:
+				return isParallel != IS_PARALLEL_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -346,6 +398,8 @@ public class DiagramImpl extends EObjectImpl implements Diagram {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (Name: ");
 		result.append(name);
+		result.append(", IsParallel: ");
+		result.append(isParallel);
 		result.append(')');
 		return result.toString();
 	}

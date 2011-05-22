@@ -262,13 +262,22 @@ public interface EditorPackage extends EPackage {
 	int DIAGRAM__EDGES = 4;
 
 	/**
+	 * The feature id for the '<em><b>Is Parallel</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DIAGRAM__IS_PARALLEL = 5;
+
+	/**
 	 * The number of structural features of the '<em>Diagram</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DIAGRAM_FEATURE_COUNT = 5;
+	int DIAGRAM_FEATURE_COUNT = 6;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.
@@ -523,6 +532,17 @@ public interface EditorPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getDiagram_Edges();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.editor.editor.Diagram#isIsParallel <em>Is Parallel</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Is Parallel</em>'.
+	 * @see org.eclipse.editor.editor.Diagram#isIsParallel()
+	 * @see #getDiagram()
+	 * @generated
+	 */
+	EAttribute getDiagram_IsParallel();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.editor.editor.Edge <em>Edge</em>}'.
@@ -790,6 +810,14 @@ public interface EditorPackage extends EPackage {
 		 * @generated
 		 */
 		EReference DIAGRAM__EDGES = eINSTANCE.getDiagram_Edges();
+
+		/**
+		 * The meta object literal for the '<em><b>Is Parallel</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute DIAGRAM__IS_PARALLEL = eINSTANCE.getDiagram_IsParallel();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.editor.editor.impl.EdgeImpl <em>Edge</em>}' class.

@@ -22,6 +22,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.eclipse.editor.editor.Diagram#getStates <em>States</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.Diagram#getSubdiagrams <em>Subdiagrams</em>}</li>
  *   <li>{@link org.eclipse.editor.editor.Diagram#getEdges <em>Edges</em>}</li>
+ *   <li>{@link org.eclipse.editor.editor.Diagram#isIsParallel <em>Is Parallel</em>}</li>
  * </ul>
  * </p>
  *
@@ -121,5 +122,31 @@ public interface Diagram extends EObject {
 	 * @generated
 	 */
 	EList<Edge> getEdges();
+
+	/**
+	 * Returns the value of the '<em><b>Is Parallel</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Is Parallel</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Is Parallel</em>' attribute.
+	 * @see #setIsParallel(boolean)
+	 * @see org.eclipse.editor.editor.EditorPackage#getDiagram_IsParallel()
+	 * @model
+	 * @generated
+	 */
+	boolean isIsParallel();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.editor.editor.Diagram#isIsParallel <em>Is Parallel</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Is Parallel</em>' attribute.
+	 * @see #isIsParallel()
+	 * @generated
+	 */
+	void setIsParallel(boolean value);
 
 } // Diagram

@@ -65,6 +65,10 @@
         <element xmi:type="ecore:EAttribute" href="editor.ecore#//Diagram/Name"/>
         <layoutConstraint xmi:type="notation:Location" xmi:id="_iyVO4W9bEeCf5-jj6YvlzA"/>
       </children>
+      <children xmi:type="notation:Node" xmi:id="_qis7IYRoEeCK17Lw_dBEOQ" type="2001">
+        <element xmi:type="ecore:EAttribute" href="editor.ecore#//Diagram/IsParallel"/>
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_qis7IoRoEeCK17Lw_dBEOQ"/>
+      </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_ZqzCom9bEeCf5-jj6YvlzA"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_ZqzCo29bEeCf5-jj6YvlzA"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_ZqzCpG9bEeCf5-jj6YvlzA"/>
