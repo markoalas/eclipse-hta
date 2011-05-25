@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.editor.EditorUtil;
 import org.eclipse.editor.Log;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.emf.common.util.EList;
@@ -63,17 +64,9 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	public IReason updateNeeded(IUpdateContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 
-		IReason nameReason = getNameUpdateReason(pictogramElement);
-		if (nameReason.toBoolean()) {
-			return nameReason;
-		}
-
-		IReason connectorsReason = getConnectorsUpdateReason(pictogramElement);
-		if (connectorsReason.toBoolean()) {
-			return connectorsReason;
-		}
-
-		return Reason.createFalseReason();
+		return EditorUtil.firstTrueReason(
+				getNameUpdateReason(pictogramElement), 
+				getConnectorsUpdateReason(pictogramElement));
 	}
 
 	private IReason getNameUpdateReason(PictogramElement pictogramElement) {
@@ -149,8 +142,8 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 
 		for (BoxRelativeAnchor a : relativeAnchors) {
 			Iterable<EObject> connectors = Iterables.filter(a.getLink().getBusinessObjects(), instanceOf(Connector.class));
-			for(EObject c : connectors) {
-				anchors.put((Connector)c, a);
+			for (EObject c : connectors) {
+				anchors.put((Connector) c, a);
 			}
 		}
 

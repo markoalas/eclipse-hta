@@ -6,6 +6,8 @@ import static com.google.common.collect.Iterables.transform;
 import static java.util.Arrays.asList;
 
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.graphiti.features.IReason;
+import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 import com.google.common.base.Function;
@@ -53,6 +55,16 @@ public class EditorUtil {
 
 	public static boolean isEmpty(String str) {
 		return str == null || str.length() == 0;
+	}
+	
+	public static IReason firstTrueReason(IReason... reasons) {
+		for (IReason r : reasons) {
+			if (r.toBoolean()) {
+				return r;
+			}
+		}
+		
+		return Reason.createFalseReason();
 	}
 
 }
