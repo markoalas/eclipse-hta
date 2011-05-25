@@ -20,11 +20,7 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 		EndPoint source = getEndPoint(context.getSourceAnchor());
 		EndPoint target = getEndPoint(context.getTargetAnchor());
 
-		if (source != null && target != null && source != target) {
-			return true;
-		}
-
-		return false;
+		return source != null && target != null && source != target;
 	}
 
 	public boolean canStartConnection(ICreateConnectionContext context) {

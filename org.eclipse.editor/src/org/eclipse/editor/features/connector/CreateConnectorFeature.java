@@ -1,5 +1,8 @@
 package org.eclipse.editor.features.connector;
 
+import static org.eclipse.editor.EditorUtil.isEmpty;
+
+import org.eclipse.editor.EditorUtil;
 import org.eclipse.editor.editor.Connector;
 import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;
@@ -23,10 +26,9 @@ public class CreateConnectorFeature extends AbstractCreateFeature {
 
     public Object[] create(ICreateContext context) {
         String newConnectorName = ExampleUtil.askString(TITLE, USER_QUESTION, "");
-        if (newConnectorName == null || newConnectorName.trim().length() == 0) {
+        if (isEmpty(newConnectorName)) {
             return EMPTY;
         }
-        
         
         Diagram d = (Diagram)context.getTargetContainer();
         org.eclipse.editor.editor.Diagram diagram = (org.eclipse.editor.editor.Diagram)getAllBusinessObjectsForPictogramElement(d)[0];

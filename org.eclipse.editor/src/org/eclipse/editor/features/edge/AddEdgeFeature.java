@@ -22,7 +22,6 @@ public class AddEdgeFeature extends AbstractAddFeature {
 	}
 
 	public PictogramElement add(IAddContext context) {
-
 		IAddConnectionContext addConContext = (IAddConnectionContext) context;
 		Edge addedEdge = (Edge) context.getNewObject();
 		IGaService gaService = Graphiti.getGaService();
