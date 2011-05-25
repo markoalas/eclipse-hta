@@ -84,9 +84,6 @@ public class AddSubdiagramFeature extends AbstractAddFeature {
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.getFont().setBold(true);
 			gaService.setLocationAndSize(text, 10, 0, width, 20);
-
-			// create link and wire it
-			//link(shape, addedSubdiagram);
 		}
 
 		layoutPictogramElement(containerShape);
