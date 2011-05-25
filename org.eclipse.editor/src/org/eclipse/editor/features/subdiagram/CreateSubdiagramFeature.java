@@ -1,5 +1,7 @@
 package org.eclipse.editor.features.subdiagram;
 
+import static org.eclipse.editor.EditorUtil.isEmpty;
+
 import org.eclipse.editor.editor.EditorFactory;
 import org.eclipse.graphiti.examples.common.ExampleUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -22,7 +24,7 @@ public class CreateSubdiagramFeature extends AbstractCreateFeature {
 
     public Object[] create(ICreateContext context) {
         String name = ExampleUtil.askString(TITLE, USER_QUESTION, "");
-        if (name == null || name.trim().length() == 0) {
+        if (isEmpty(name)) {
             return EMPTY;
         }
 
@@ -30,7 +32,6 @@ public class CreateSubdiagramFeature extends AbstractCreateFeature {
         getDiagram().eResource().getContents().add(diagram);
         diagram.setName(name);
         addGraphicalRepresentation(context, diagram);
-        //link(getDiagram(), diagram);
 
         return new Object[] { diagram };
     }
