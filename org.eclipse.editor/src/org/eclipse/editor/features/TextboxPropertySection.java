@@ -3,7 +3,6 @@ package org.eclipse.editor.features;
 import static org.eclipse.editor.EditorUtil.nvl;
 
 import org.eclipse.editor.AbstractPropertySection;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -16,18 +15,17 @@ public abstract class TextboxPropertySection<T> extends AbstractPropertySection<
 	private Text text;
 
 	@Override
-	protected void createRow(TabbedPropertySheetWidgetFactory factory, Composite composite) {
+	protected void createEditElement(TabbedPropertySheetWidgetFactory factory, Composite composite) {
 		text = factory.createText(composite, "");
 
-		FormData data;
-		data = new FormData();
+		FormData data = new FormData();
 		data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
 		data.right = new FormAttachment(100, 0);
 		text.setLayoutData(data);
 
 		text.addModifyListener(new ModifyListener() {
 			@Override
-			public void modifyText(ModifyEvent arg0) {
+			public void modifyText(ModifyEvent _) {
 				if (!nvl(getValue()).equals(text.getText())) {
 					doInTransaction(new Runnable() {
 						@Override
@@ -38,9 +36,6 @@ public abstract class TextboxPropertySection<T> extends AbstractPropertySection<
 				}
 			}
 		});
-
-		CLabel nameLabel = factory.createCLabel(composite, getLabel());
-		nameLabel.setLayoutData(new FormData());
 	}
 
 	@Override

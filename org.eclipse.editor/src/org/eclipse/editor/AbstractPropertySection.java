@@ -5,19 +5,21 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public abstract class AbstractPropertySection<T,U> extends GFPropertySection implements ITabbedPropertyConstants {
+public abstract class AbstractPropertySection<ObjectType, PropertyType> extends GFPropertySection implements ITabbedPropertyConstants {
 	@SuppressWarnings("unchecked")
-	protected T getBusinessObject() {
+	protected ObjectType getBusinessObject() {
 		PictogramElement pe = getSelectedPictogramElement();
 
 		if (pe != null) {
-			return (T) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+			return (ObjectType) Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
 		}
 
 		return null;
@@ -32,7 +34,11 @@ public abstract class AbstractPropertySection<T,U> extends GFPropertySection imp
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
 
-		createRow(factory, composite);
+		FormData data = new FormData();
+		CLabel label = factory.createCLabel(composite, getLabel());
+		label.setLayoutData(data);
+
+		createEditElement(factory, composite);
 	}
 
 	protected void doInTransaction(final Runnable runnable) {
@@ -44,9 +50,12 @@ public abstract class AbstractPropertySection<T,U> extends GFPropertySection imp
 		});
 	}
 
-	protected abstract void createRow(TabbedPropertySheetWidgetFactory factory, Composite composite);
-	protected abstract U getValue();
-	protected abstract void setValue(U value);
+	protected abstract void createEditElement(TabbedPropertySheetWidgetFactory factory, Composite composite);
+
+	protected abstract PropertyType getValue();
+
+	protected abstract void setValue(PropertyType value);
+
 	protected abstract String getLabel();
 
 }
