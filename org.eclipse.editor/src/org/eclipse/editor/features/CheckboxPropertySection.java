@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public abstract class CheckboxPropertySection<T> extends AbstractPropertySection<T>{
+public abstract class CheckboxPropertySection<T> extends AbstractPropertySection<T, Boolean> {
 	protected Button checkbox;
 	protected void createRow(TabbedPropertySheetWidgetFactory factory, Composite composite) {
 		checkbox = factory.createButton(composite, "", SWT.CHECK);
@@ -40,8 +40,4 @@ public abstract class CheckboxPropertySection<T> extends AbstractPropertySection
 	public void refresh() {
 		checkbox.setSelection(getValue());
 	}
-	
-	protected abstract boolean getValue();
-	protected abstract void setValue(boolean value);
-	protected abstract String getLabel();
 }

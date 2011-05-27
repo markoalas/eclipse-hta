@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public abstract class TextboxPropertySection<T> extends AbstractPropertySection<T> {
+public abstract class TextboxPropertySection<T> extends AbstractPropertySection<T, String> {
 	private Text text;
 
 	@Override
@@ -47,10 +47,4 @@ public abstract class TextboxPropertySection<T> extends AbstractPropertySection<
 	public void refresh() {
 		text.setText(nvl(getValue()));
 	}
-
-	protected abstract String getValue();
-
-	protected abstract void setValue(String value);
-
-	protected abstract String getLabel();
 }

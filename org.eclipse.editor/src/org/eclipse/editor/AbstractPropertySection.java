@@ -11,7 +11,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public abstract class AbstractPropertySection<T> extends GFPropertySection implements ITabbedPropertyConstants {
+public abstract class AbstractPropertySection<T,U> extends GFPropertySection implements ITabbedPropertyConstants {
 	@SuppressWarnings("unchecked")
 	protected T getBusinessObject() {
 		PictogramElement pe = getSelectedPictogramElement();
@@ -45,4 +45,8 @@ public abstract class AbstractPropertySection<T> extends GFPropertySection imple
 	}
 
 	protected abstract void createRow(TabbedPropertySheetWidgetFactory factory, Composite composite);
+	protected abstract U getValue();
+	protected abstract void setValue(U value);
+	protected abstract String getLabel();
+
 }

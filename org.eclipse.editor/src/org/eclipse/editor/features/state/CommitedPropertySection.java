@@ -5,12 +5,12 @@ import org.eclipse.editor.features.CheckboxPropertySection;
 
 public class CommitedPropertySection extends CheckboxPropertySection<State>{
 	@Override
-	protected boolean getValue() {
+	protected Boolean getValue() {
 		return getBusinessObject().isCommitted();
 	}
 
 	@Override
-	protected void setValue(boolean value) {
+	protected void setValue(Boolean value) {
 		getBusinessObject().setCommitted(value);
 	}
 

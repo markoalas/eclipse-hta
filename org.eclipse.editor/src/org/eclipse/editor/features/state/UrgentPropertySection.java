@@ -5,12 +5,12 @@ import org.eclipse.editor.features.CheckboxPropertySection;
 
 public class UrgentPropertySection extends CheckboxPropertySection<State> {
 	@Override
-	protected boolean getValue() {
+	protected Boolean getValue() {
 		return getBusinessObject().isUrgent();
 	}
 
 	@Override
-	protected void setValue(boolean value) {
+	protected void setValue(Boolean value) {
 		getBusinessObject().setUrgent(value);
 	}
 
