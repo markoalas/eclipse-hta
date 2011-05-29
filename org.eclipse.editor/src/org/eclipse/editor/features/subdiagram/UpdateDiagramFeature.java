@@ -13,6 +13,7 @@ import static org.eclipse.editor.EditorUtil.cast;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -64,9 +65,7 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	public IReason updateNeeded(IUpdateContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 
-		return EditorUtil.firstTrueReason(
-				getNameUpdateReason(pictogramElement), 
-				getConnectorsUpdateReason(pictogramElement));
+		return EditorUtil.firstTrueReason(getNameUpdateReason(pictogramElement), getConnectorsUpdateReason(pictogramElement));
 	}
 
 	private IReason getNameUpdateReason(PictogramElement pictogramElement) {
@@ -105,7 +104,11 @@ public class UpdateDiagramFeature extends AbstractUpdateFeature {
 	}
 
 	private Iterable<PictogramElement> getConnectorElementsForDiagram(PictogramElement pictogramElement) {
-		return filter(getAllElementsForDiagram(pictogramElement), isLinkedToConnector());
+		try {
+			return filter(getAllElementsForDiagram(pictogramElement), isLinkedToConnector());
+		} catch (Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private Predicate<PictogramElement> isLinkedToConnector() {
