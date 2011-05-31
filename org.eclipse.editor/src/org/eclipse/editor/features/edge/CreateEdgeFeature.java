@@ -32,8 +32,6 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 	}
 
 	public Connection create(ICreateConnectionContext context) {
-		Connection newConnection = null;
-
 		Edge edge = EditorFactory.eINSTANCE.createEdge();
 		edge.setStart(getEndPoint(context.getSourceAnchor()));
 		edge.setEnd(getEndPoint(context.getTargetAnchor()));
@@ -41,9 +39,7 @@ public class CreateEdgeFeature extends AbstractCreateConnectionFeature {
 
 		AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
 		addContext.setNewObject(edge);
-		newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
-
-		return newConnection;
+		return (Connection) getFeatureProvider().addIfPossible(addContext);
 	}
 
 	private EndPoint getEndPoint(Anchor anchor) {
